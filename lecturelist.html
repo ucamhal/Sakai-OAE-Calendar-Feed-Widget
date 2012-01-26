@@ -17,16 +17,28 @@
                     location: <span class="lecture-location">Arts School, Room A</span>
                 </div>
             </div>
+            
+            <!-- Table for the sake of making the <tr> valid. -->
+            <table>
+            <tr class="agenda-row">
+                <td rowspan="2" class="date">Mon 3 Feb</td>
+                <td class="time">10-11 am</td>
+                <td class="description">Hunting The Gene, Babbage Lecture Theatre, Dr DK Summers [dks11]</td>
+            </tr>
+            </table>
         </div>
         
         <!-- MAIN VIEW -->
-        <div id="lecturelist_main" style="display:none;">
-            <div class="loading" style="display: none;">
+        <div id="lecturelist_main" style="">
+            <div class="loading" style="/*display: none;*/">
                 <img class="center" alt="loading.." src="/devwidgets/lecturelist/images/loading.gif"></img>
             </div>
-            <div class="ajax-content" style="display: none;">
+            <div class="ajax-content" style="/*display: none;*/">
                 <h1 class="header1 lecture-subject"></h1>
-                <div id="lecturelist_lectures"></div>            
+                <div id="lecturelist_lectures">
+                    <table id="agenda">
+                    </table>            
+                </div>
             </div>
         </div>
         <!-- SETTINGS VIEW -->

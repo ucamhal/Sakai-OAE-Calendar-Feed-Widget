@@ -53,23 +53,27 @@
 	padding-bottom: 6px;
 }
 
-.lecturelist_widget .entry .main-row {
-	margin-bottom: 0.5em;
+/* Agenda Table */
+
+.lecturelist_widget table {
+	border-collapse: collapse;
+	border-spacing: 0;
 }
-.lecturelist_widget .lecture-title {
+
+.lecturelist_widget table tbody:first-child tr:first-child td {
+	border-top: none;
+}
+
+.lecturelist_widget table tbody tr:first-child td {
+	border-top: 1px solid #ccc;
+}
+
+.lecturelist_widget td {
+	vertical-align: top;
+	padding: 10px;
+}
+.lecturelist_widget td.date {
 	font-weight: bold;
-	font-size: 1.2em;
-}
-
-.lecturelist_widget .lecture-presenter {
-	font-style: italic;
-	padding-left: 1em;
-}
-
-.lecturelist_widget .entry {
-	padding-top:    10px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid #ccc;
 }
 
 /*
