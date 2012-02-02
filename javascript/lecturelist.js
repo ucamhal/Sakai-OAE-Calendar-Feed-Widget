@@ -1,7 +1,8 @@
 // load the master sakai object to access all Sakai OAE API methods
 require(["jquery", 
          "sakai/sakai.api.core", 
-         "/devwidgets/lecturelist/javascript/jquery.icalendar.js"], 
+         "/devwidgets/lecturelist/javascript/jquery.icalendar.js",
+         "/devwidgets/lecturelist/javascript/parseuri.js"], 
         function($, sakai) {
 	
     /**
@@ -18,22 +19,26 @@ require(["jquery",
      */
 	sakai_global.lecturelist = function (tuid, showSettings) {
          
-        /////////////////////////////
+		var ICAL_PROXY_PATH = "/var/proxy/ical.json"
+			
+		var LECTURE_ENTRY = $("#lecturelist_templates .entry", $rootel);
+		var AGENDA_ROW = $("#lecturelist_templates .agenda-row", $rootel);
+		/////////////////////////////
         // Configuration variables //
         /////////////////////////////
-
+		
     	// DOM jQuery Objects
         var $rootel = $("#" + tuid);  // unique container for each widget instance
         var $mainContainer = $("#lecturelist_main", $rootel);
         var $settingsContainer = $("#lecturelist_settings", $rootel);
+        var settingsForm = $("#lecturelist_settings_form", $rootel);
+        var settingsFormTitleField = $("#lecturelist_settings_txtTitle", $rootel);
+        var settingsFormUrlField = $("#lecturelist_settings_txtUrl", $rootel);
         
-        var BASE_URL = "http://localhost/php/gcal.php"
-        var SUBJECT_ID = "T0024001692011001,T0024001692011012";
-        
-        var LECTURE_ENTRY = $("#lecturelist_templates .entry", $rootel);
-        var AGENDA_ROW = $("#lecturelist_templates .agenda-row", $rootel);
-
-        var BSLASH_REGEX = new RegExp('\\\\', 'g');
+        // Widget state vars
+        var _title = null;
+        var _feedUrl = null;
+        var _groupedDays = null;
         
         DAYS = {"0": "Mon",
         		"1": "Tue",
@@ -56,28 +61,80 @@ require(["jquery",
         		  "10": "Nov",
         		  "11": "Dec"};
         
+        /**
+         * A class to represent events.
+         */
+    	function Event(vevent) {
+    		
+    		this.vevent = vevent;
+    		this.date = buildDateString(vevent.DTSTART);
+    		this.time = buildTimeString(vevent.DTSTART);
+    		this.description = vevent.DESCRIPTION || vevent.DESCRIPTION || "";
+    	}
+        
         ///////////////////////
         // Utility functions //
         ///////////////////////
         
+        function onStateAvailable(succeeded, state) {
+        	if(!succeeded) {
+        		alert("Failed to fetch widget state.");
+        		return;
+        	}
+        	
+        	_title = state.title;
+        	_feedUrl = state.url;
+        	fetchCalendarData();
+        }
+        
         function fetchCalendarData() {
         	var success = function(data) {
-        		var ical = $.icalendar.parse(data.calendardata);
-        		var days = groupByDay(
-        				$.grep(ical.vevent, notBefore(stripTime(new Date()))));
-        		showCalendar({name: ical["x-wr-calname"]._value, days: days});
+        		if(data.vcalendar && data.vcalendar.vevents) {
+        			var events = data.vcalendar.vevents;
+        			
+        			// Convert event date strings into date objects
+        			events = $.map(events, parseEventDates);
+        			
+        			// Filter the events to just those happening today
+        			events = $.grep(events, notBefore(dateToday()));
+        			
+        			// Group the events into a list of groups, one for each day
+        			_groupedDays = groupByDay(events);
+        			
+        		}
+        		updateCalendar();
         	};
         	
         	$.ajax({
-        		url: BASE_URL,
-        		data: {course: SUBJECT_ID, type: "ical"},
-        		dataType: 'jsonp',
+        		url: ICAL_PROXY_PATH,
+        		data: {fooble: _feedUrl},
         		success: success});
+        }
+        
+        function parseEventDates(event) {
+        	event.DTSTART = new Date(event.DTSTART);
+        	event.DTEND = new Date(event.DTEND);
+        	return event;
+        }
+        
+        function dateToday() {
+        	return stripTime(new Date());
+        }
+        function dateTomorrow() {
+        	var today = dateToday();
+        	today.setDate(today.getDate() + 1);
+        	return today;
         }
         
         function notBefore(date) {
         	return function(event) {
-        		return event.dtstart >= date;
+        		return event.DTSTART >= date;
+        	}
+        }
+        
+        function between(dateStart, dateEnd) {
+        	return function(event) {
+        		return event.dtstart >= dateStart && event.dstart < dateEnd;
         	}
         }
         
@@ -86,15 +143,19 @@ require(["jquery",
         	for(var i = 0; i < vevents.length; ++i) {
         		var event = vevents[i];
         		// We need a string to key our obj with
-        		var dateKey = stripTime(event.dtstart).toISOString();
+        		var dateKey = stripTime(event.DTSTART).toISOString();
         		if(!days[dateKey]) {
         			days[dateKey] = []
         		}
-        		days[dateKey].push(event);
+        		days[dateKey].push(new Event(event));
         	}
         	var sortedDays = [];
         	for(key in days) {
-        		sortedDays.push([key, days[key]]);
+        		var events = days[key];
+        		events.sort(function(a, b){
+        			return a.vevent.DTSTART.milliseconds - b.vevent.DTSTART.milliseconds;
+        		});
+        		sortedDays.push([key, events]);
         	}
         	sortedDays.sort(function(a, b) {
         		if(a[0] < b[0])
@@ -112,54 +173,29 @@ require(["jquery",
         			date.getDate());
         }
         
+        /** 
+         * Loads widget saved state, calling the callback(success, data) 
+         * function once the state is loaded.
+         */
+        function getState(callback) {
+        	sakai.api.Widgets.loadWidgetData(tuid, callback);
+        }
+        
         /////////////////////////
         // Main View functions //
         /////////////////////////
 
-        /** Called when the timetable lecture data has been recieved. */
-        function showCalendar(calendar) {
-        	$(".lecture-subject", $rootel).text("Lectures of " + calendar.name);
-        	var agendaTable = $("#lecturelist_lectures #agenda", $rootel);
-        	console.log(agendaTable);
-        	for(var i = 0; i < calendar.days.length; ++i) {
-        		var day = calendar.days[i];
-        		var dayDateStr = day[0];
-        		var entries = day[1];
-        		appendDaysToTable(agendaTable, new Date(dayDateStr), entries);
-        	}
+        /** Called when the calendar data has been updated. */
+        function updateCalendar() {
         	
+        	var rendered = sakai.api.Util.TemplateRenderer("#agenda_template", {
+				title: _title,
+				days: _groupedDays
+			});
+        	
+        	$(".ajax-content", $rootel).html(rendered);
         	$(".loading", $rootel).hide();
         	$(".ajax-content", $rootel).show();
-        }
-        
-        /**
-         * @param table A JQuery wrapper of the element to insert the days into.
-         * @param day A Date object representing the day.
-         * @param events A list of events occuring on a single day.
-         */
-        function appendDaysToTable(table, day, events) {
-        	var root = $("<tbody>");
-        	for(var i = 0; i < events.length; ++i) {
-        		var event = events[i];
-        		var tr = buildRow(event);
-        		if(i === 0) { // first
-        			tr.prepend($("<td class='date'>")
-        					.text(buildDateString(day))
-        					.attr("rowspan", events.length));
-        		}
-        		
-        		root.append(tr);
-        	}
-        	table.append(root);
-        }
-        
-        function buildRow(event) {
-        	var root = $("<tr>");
-        	root.append($("<td class='time'>").text(
-        			buildTimeString(event.dtstart)));
-        	root.append($("<td class='description'>").text(
-        			event.summary.replace(BSLASH_REGEX, "")));
-        	return root;
         }
         
         function buildTimeString(date) {
@@ -181,16 +217,53 @@ require(["jquery",
         // Settings View functions //
         /////////////////////////////
 
+        /**
+         * Watch for value changes to the settings URL field in order to rewrite 
+         * webcal:// urls to http://.
+         */
+        settingsFormUrlField.change(function() {
+        	var urltext = $(this).val();
+        	// Help people inputting webcal:// links by rewriting them to http
+        	urltext = urltext.replace(/^webcal:\/\//, "http://")
+        	$(this).val(urltext);
+        });
 
+        function onWidgetSettingsStateAvailable(success, state) {
+        	if(success) {
+	        	settingsFormTitleField.val(state.title);
+	        	settingsFormUrlField.val(state.url);
+        	}
+        	else {
+        		alert("Error fetching saved settings");
+        	}
+        }
 
-        ////////////////////
-        // Event Handlers //
-        ////////////////////
-
-
-
+        /** Add listener to setting form submit */
+        function settingsSave() {
+        	var state = {
+        			title: 	settingsFormTitleField.val(),
+        			url: settingsFormUrlField.val()
+        	};
+        	
+        	// async save our widget's state
+        	sakai.api.Widgets.saveWidgetData(tuid, state, 
+        			onWidgetSettingsDataSaved);
+        }
+        
+        function onWidgetSettingsDataSaved(success, data) {
+        	if (success) {
+        		// Settings finished, switch to Main view
+        		sakai.api.Widgets.Container.informFinish(tuid, "lecturelist");
+        	} else {
+        		sakai.api.Util.notification.show("Couldn't Save Your Settings", 
+        				"An error prevented your settings from being saved. "
+        				+ " Please try again.",
+        				sakai.api.Util.notification.type.ERROR);
+        	}
+        }
+        
         /////////////////////////////
-        // Initialization function //
+        // Initialisation function //
         /////////////////////////////
         
         /**
@@ -199,14 +272,23 @@ require(["jquery",
         var doInit = function () {
             console.log("lecturelist doInit()");
             
-            // Trigger async fetch of calendar data
-            fetchCalendarData();
-            
             if (showSettings) {
+            	
+            	// Setup validation on settings form
+            	var validateOpts = { submitHandler: settingsSave };
+                sakai.api.Util.Forms.validate(settingsForm, validateOpts, true);
+            	
+                // Async fetch widget settings to populate form
+                getState(onWidgetSettingsStateAvailable);
+                
                 // show the Settings view
                 $settingsContainer.show();
             } else {
-                // set up Main view
+            	// set up Main view
+
+            	// Async fetch widget settings to populate form
+                getState(onStateAvailable);
+                
             	$mainContainer.show();
             	$(".loading", $rootel).fadeIn(1000);
             }

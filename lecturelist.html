@@ -6,6 +6,32 @@
     <div class="s3d-widget-content">
     
         <!-- Stuff for JS templating -->
+        <div id="agenda_template" style="display: none;"><!--
+            <div>
+            <h1 class="header1 lecture-subject">${title}</h1>
+            <div id="lecturelist_lectures">
+              <table id="agenda">
+                {for day in days}
+                    {var events = day[1]}
+                    <tbody>
+                    {for event in events}
+                        <tr class="agenda-row">
+                            
+                            {if event_index == 0}
+                                <td rowspan="${events.length}"
+                                class="date">${event.date}</td>
+                            {/if} 
+                            
+                            <td class="time">${event.time}</td>
+                            <td class="description">${event.description}</td>
+                        </tr>
+                    {/for}
+                    </tbody>
+                {/for}
+              </table>            
+            </div>
+            </div>
+         --></div>
         <div id="lecturelist_templates" style="display: none;">
             <div class="entry">
                 <div class="main-row">
@@ -29,16 +55,11 @@
         </div>
         
         <!-- MAIN VIEW -->
-        <div id="lecturelist_main" style="">
-            <div class="loading" style="/*display: none;*/">
+        <div id="lecturelist_main" style="display:none;">
+            <div class="loading" style="display: none;">
                 <img class="center" alt="loading.." src="/devwidgets/lecturelist/images/loading.gif"></img>
             </div>
             <div class="ajax-content" style="/*display: none;*/">
-                <h1 class="header1 lecture-subject"></h1>
-                <div id="lecturelist_lectures">
-                    <table id="agenda">
-                    </table>            
-                </div>
             </div>
         </div>
         <!-- SETTINGS VIEW -->
@@ -48,16 +69,16 @@
                  view defined above - both should not be visible at the same
                  time
              -->
-            <form id="lecturelist_settings_form" action="#">
-                <p>Colour to use:
-                    <select id="lecturelist_color">
-                        <option value="#000000">__MSG__BLACK__</option>
-                        <option value="#FF0000">__MSG__RED__</option>
-                        <option value="#00FF00">__MSG__GREEN__</option>
-                        <option value="#0000FF">__MSG__BLUE__</option>
-                    </select>
-                </p>
-                <p><button type="submit">__MSG__SAVE__</button></p>
+            <p>Complete the form below to add calendar events to your page.</p>
+             
+            <form id="lecturelist_settings_form">
+                <div class="s3d-form-field-wrapper">
+                    <label for="lecturelist_settings_txtTitle" class="s3d-input-label s3d-input-label-above">Title:</label>
+                    <input type="text" id="lecturelist_settings_txtTitle" name="rss_settings_txtTitle" class="required s3d-input-full-width" />
+                    <label for="lecturelist_settings_txtUrl" class="s3d-input-label s3d-input-label-above">Calendar URL (iCalendar):</label>
+                    <input type="text" id="lecturelist_settings_txtUrl" name="rss_settings_txtUrl" class="required url s3d-input-full-width" />
+                    <button type="submit" class="s3d-button s3d-header-button rss_settings_btnAddUrl">Save</button>
+                </div>
             </form>
         </div>
     </div>
