@@ -30,6 +30,12 @@
 	color: #333333;
 }
 
+h1, h2, h3, h4, h5, h6 {
+	color: #666;
+}
+
+table { margin: 0; }
+
 /* widget icon (for widgets that may appear on a dashboard) 
    icons are usually around 18 x 18 pixels */
 .lecturelist.s3d-widget .s3d-widget-titlebar .widget_title {
@@ -55,25 +61,85 @@
 
 /* Agenda Table */
 
-.lecturelist_widget table {
+.lecturelist_widget table#agenda {
 	border-collapse: collapse;
 	border-spacing: 0;
+	table-layout: fixed;
+	width: 100%;
 }
 
-.lecturelist_widget table tbody:first-child tr:first-child td {
+.lecturelist_widget table#agenda tbody:first-child tr:first-child td {
 	border-top: none;
 }
 
-.lecturelist_widget table tbody tr:first-child td {
+.lecturelist_widget table#agenda tbody tr:first-child td {
 	border-top: 1px solid #ccc;
+	padding-top: 10px;
+}
+
+.lecturelist_widget table#agenda tbody tr:last-child td {	
+	padding-bottom: 20px;
 }
 
 .lecturelist_widget td {
-	vertical-align: top;
-	padding: 10px;
+	
+	padding: 5px 0 5px 0;
+	
 }
 .lecturelist_widget td.date {
+	vertical-align: top;
 	font-weight: bold;
+	white-space: nowrap;
+	width: 80px;
+}
+
+.lecturelist_widget td.time {
+	vertical-align: top;
+	width: 60px;
+}
+
+.lecturelist_widget .description {
+	overflow: hidden;
+}
+
+.lecturelist_widget .summary {
+	font-weight: bold;
+}
+.lecturelist_widget .compact {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;	
+}
+.lecturelist_widget .expandable:before {
+	content: "[+]";
+	font-size: 0.8em;
+	vertical-align: top;
+	font-family: monospace;
+}
+.lecturelist_widget .contractable:before {
+	content: "[-]";
+	font-size: 0.8em;
+	vertical-align: top;
+	font-family: monospace;
+}
+
+.lecturelist_widget .description .full {
+	display: none;
+	margin: 1em 0em 0em 0em;
+	padding: 0 1em 0 1em;
+	border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.lecturelist_widget .link:hover {
+	text-decoration: underline;
+}
+.lecturelist_widget .link {
+	cursor: pointer;
+	color: #2683bc;
+}
+
+.lecturelist_widget table.info-block {
+	table-layout: auto;
 }
 
 /*

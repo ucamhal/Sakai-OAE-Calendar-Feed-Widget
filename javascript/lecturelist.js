@@ -66,10 +66,25 @@ require(["jquery",
          */
     	function Event(vevent) {
     		
+    		function paragraphBreak(text) {
+    			// Break the text on blank lines
+    			return text.split(/^\s*$/m);
+    		}
+    		
     		this.vevent = vevent;
     		this.date = buildDateString(vevent.DTSTART);
     		this.time = buildTimeString(vevent.DTSTART);
-    		this.description = vevent.DESCRIPTION || vevent.DESCRIPTION || "";
+    		this.summary = vevent.SUMMARY || vevent.DESCRIPTION || "";
+    		this.description = vevent.DESCRIPTION || vevent.SUMMARY || "";
+    		if(this.description == this.summary) {
+    			this.description = "";
+    		}
+    		this.description = paragraphBreak(this.description);
+    		
+    		// These fields may be undefined
+    		this.url = vevent.URL;
+    		this.location = vevent.LOCATION;
+    		this.contact = vevent.CONTACT;
     	}
         
         ///////////////////////
@@ -194,6 +209,8 @@ require(["jquery",
 			});
         	
         	$(".ajax-content", $rootel).html(rendered);
+        	$(".ajax-content .summary.compact", $rootel).toggle(
+        			expandCalendarEntry, contractCalendarEntry);
         	$(".loading", $rootel).hide();
         	$(".ajax-content", $rootel).show();
         }
@@ -211,6 +228,22 @@ require(["jquery",
         	var dayNumber = date.getDate();
         	var monthName = MONTHS[date.getMonth()];
         	return dayName + " " + dayNumber + " " + monthName;
+        }
+        
+        function expandCalendarEntry(jqevent) {
+        	var summary = $(this);
+        	var expanded = summary.siblings(".full");
+        	
+        	summary.removeClass("compact expandable").addClass("contractable");
+        	expanded.slideDown();
+        }
+        
+        function contractCalendarEntry(jqevent) {
+        	var summary = $(this);
+        	var expanded = summary.siblings(".full");
+        	
+        	summary.addClass("compact expandable").removeClass("contractable");
+        	expanded.slideUp();
         }
 
         /////////////////////////////

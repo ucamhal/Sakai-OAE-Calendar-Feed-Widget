@@ -23,7 +23,37 @@
                             {/if} 
                             
                             <td class="time">${event.time}</td>
-                            <td class="description">${event.description}</td>
+                            <td class="description">
+                                <div class="summary compact link expandable">
+                                    ${event.summary}
+                                </div>
+                                <div class="full">
+                                    {for para in event.description}
+                                    <p>${para}</p>
+                                    {/for}
+                                    <table class="info-block">
+                                    {if event.url}
+                                        <tr>
+                                            <td><span class="label">URL:</span></td>
+                                            <td><a target="_blank" href="${event.url}" class="value link">${event.url}</a></td>
+                                        </tr>
+                                    {/if}
+                                    {if event.location}
+                                        <tr>
+                                            <td><span class="label">Location:</span></td>
+                                            <td><a target="_blank" href="http://maps.google.co.uk/maps?q=${encodeURIComponent(event.location)}" class="value link">${event.location}</a></td>
+                                        </tr>
+                                    {/if}
+                                    {if event.contact}
+                                        <tr>
+                                            <td><span class="label">Contact:</span></td>
+                                            <td><span class="value">${event.contact}</span></td>
+                                        </tr>
+                                    {/if}
+                                    </table>
+                                        
+                                </div>
+                            </td>
                         </tr>
                     {/for}
                     </tbody>
