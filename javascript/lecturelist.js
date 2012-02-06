@@ -61,6 +61,8 @@ require(["jquery",
         		  "10": "Nov",
         		  "11": "Dec"};
         
+        var TODAY = dateToday();
+        
         /**
          * A class to represent events.
          */
@@ -72,7 +74,9 @@ require(["jquery",
     		}
     		
     		this.vevent = vevent;
-    		this.date = buildDateString(vevent.DTSTART);
+    		this.absDate = buildAbsoluteDateString(vevent.DTSTART);
+    		this.dayDelta = getDayDelta(TODAY, vevent.DTSTART);
+    		this.relDate = buildRelativeDateString(this.dayDelta);
     		this.time = buildTimeString(vevent.DTSTART);
     		this.summary = vevent.SUMMARY || vevent.DESCRIPTION || "";
     		this.description = vevent.DESCRIPTION || vevent.SUMMARY || "";
@@ -227,25 +231,42 @@ require(["jquery",
         var DAY_MILLIS = 1000*60*60*24;
         var MAX_DAYS_AGO = 5;
         
-        function buildDateString(date) {
+        function getDayDelta(from, to) {
         	// Millisecond time @ start of today
-        	var today = dateToday().getTime(); 
-        	var datems = date.getTime();
-        	// Calculate number of days away from the start of today the date is
-        	var dayDelta = Math.floor((datems - today) / DAY_MILLIS);
-			
-        	
-        	// Use friendly relative day names if the date is close to now
-        	if(dayDelta == 0)
+        	var fromms = stripTime(from).getTime(); 
+        	var toms = stripTime(to).getTime();
+        	// Calculate number of days between from and to.
+        	return Math.floor((toms - fromms) / DAY_MILLIS);
+        }
+        
+        /**
+         * Builds a relative date string from an integer day delta. Day deltas 
+         * can be calculated by getDayDelta().
+         * 
+         * For example:
+         * buildRelativeDateString(0) => "Today"
+         * buildRelativeDateString(-1) => "Yesterday"
+         * buildRelativeDateString(1) => "Tomorrow"
+         * buildRelativeDateString(-10) => "10 days ago"
+         * buildRelativeDateString(10) => "In 10 days"
+         */
+        function buildRelativeDateString(delta) {
+        	// make sure we have an integer
+        	var days = Math.floor(delta);
+        	if(days == 0)
 				return "Today";
-			else if(dayDelta == 1)
+			else if(days == 1)
 				return "Tomorrow";
-			else if(dayDelta == -1)
+			else if(days == -1)
 				return "Yesterday";
-			else if(dayDelta < 0 && dayDelta >= -MAX_DAYS_AGO)
-				return "" + Math.abs(dayDelta) + " days ago";
-			
-        	// Else use an absolute numeric date
+			else if(days < 0)
+				return "" + Math.abs(days) + " days ago";
+			else
+				return "In " + days + " time";
+
+        }
+        
+        function buildAbsoluteDateString(date) {
         	var dayName = DAYS[date.getDay()];
         	var dayNumber = date.getDate();
         	var monthName = MONTHS[date.getMonth()];

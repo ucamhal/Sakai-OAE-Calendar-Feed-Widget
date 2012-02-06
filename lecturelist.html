@@ -19,7 +19,11 @@
                             
                             {if event_index == 0}
                                 <td rowspan="${events.length}"
-                                class="date">${event.date}</td>
+                                {if event.dayDelta < 2 && event.dayDelta >= -5}
+                                    class="date relative" title="${event.absDate}">${event.relDate}</td>
+                                {else}
+                                    class="date absolute" title="${event.relDate}">${event.absDate}</td>                                
+                                {/if}
                             {/if} 
                             
                             <td class="time">${event.time}</td>
