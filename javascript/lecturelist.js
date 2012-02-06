@@ -111,7 +111,7 @@ require(["jquery",
         			events = $.map(events, parseEventDates);
         			
         			// Filter the events to just those happening today
-        			events = $.grep(events, notBefore(dateToday()));
+        			//events = $.grep(events, notBefore(dateToday()));
         			
         			// Group the events into a list of groups, one for each day
         			_groupedDays = groupByDay(events);
@@ -223,7 +223,29 @@ require(["jquery",
         	return hour + ":" + minute;
         }
         
+        // Length of one day in milliseconds
+        var DAY_MILLIS = 1000*60*60*24;
+        var MAX_DAYS_AGO = 5;
+        
         function buildDateString(date) {
+        	// Millisecond time @ start of today
+        	var today = dateToday().getTime(); 
+        	var datems = date.getTime();
+        	// Calculate number of days away from the start of today the date is
+        	var dayDelta = Math.floor((datems - today) / DAY_MILLIS);
+			
+        	
+        	// Use friendly relative day names if the date is close to now
+        	if(dayDelta == 0)
+				return "Today";
+			else if(dayDelta == 1)
+				return "Tomorrow";
+			else if(dayDelta == -1)
+				return "Yesterday";
+			else if(dayDelta < 0 && dayDelta >= -MAX_DAYS_AGO)
+				return "" + Math.abs(dayDelta) + " days ago";
+			
+        	// Else use an absolute numeric date
         	var dayName = DAYS[date.getDay()];
         	var dayNumber = date.getDate();
         	var monthName = MONTHS[date.getMonth()];
