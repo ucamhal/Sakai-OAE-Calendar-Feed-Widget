@@ -122,7 +122,7 @@ require(["jquery",
         	
         	$.ajax({
         		url: ICAL_PROXY_PATH,
-        		data: {fooble: _feedUrl},
+        		data: {feedurl: _feedUrl},
         		success: success});
         }
         
