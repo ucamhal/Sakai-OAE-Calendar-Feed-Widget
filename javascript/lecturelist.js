@@ -262,7 +262,7 @@ require(["jquery",
 			else if(days < 0)
 				return "" + Math.abs(days) + " days ago";
 			else
-				return "In " + days + " time";
+				return "In " + days + " days time";
 
         }
         
