@@ -2,7 +2,7 @@
 require(["jquery", 
          "sakai/sakai.api.core",
          "/devwidgets/lecturelist/javascript/jquery.ui.slider.js"], 
-        function($, sakai, jqui) {
+        function($, sakai) {
 	
 	console.log({jquery: $});
     /**
