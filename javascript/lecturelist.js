@@ -4,7 +4,6 @@ require(["jquery",
          "/devwidgets/lecturelist/javascript/jquery.ui.slider.js"], 
         function($, sakai) {
 	
-	console.log({jquery: $});
     /**
      * @name sakai.WIDGET_ID
      *
@@ -104,6 +103,40 @@ require(["jquery",
         // Utility functions //
         ///////////////////////
         
+    	/**
+    	 * Builds a callback function to be passed to loadWidgetData which
+    	 * detects load failure due to no previous state being saved and calls
+    	 * the callback with success and some default values instead of failure.
+    	 * 
+    	 * By default, loadWidgetData makes no distinction between
+    	 * failure to load state due to the widget being loaded for the first 
+    	 * time, and failure due to network error (for example). 
+    	 */
+    	function defaultingStateLoadHandler(callback, defaults) {
+    		// Return a callback function to be registered with loadWidgetData
+    		return function(success, obj) {
+    			if(!success) {
+    				var xhr = obj;
+    				
+    				// Check for failure to load due to no previous state being
+    				// saved. i.e. use defaults.
+    				if(xhr.status === 404) {
+    					// fire the callback with success instead of failure
+    					// using the defaults provided
+    					callback(true, defaults);
+    				}
+    				else {    					
+	    				// Otherwise, assume it's a legitimate failure
+	    				callback(false, xhr);
+    				}
+    			}
+    			else {
+    				callback(true, obj);
+    			}
+    			
+    		}
+    	}
+    	
         function onStateAvailable(succeeded, state) {
         	if(!succeeded) {
         		alert("Failed to fetch widget state.");
@@ -206,7 +239,16 @@ require(["jquery",
          * function once the state is loaded.
          */
         function getState(callback) {
-        	sakai.api.Widgets.loadWidgetData(tuid, callback);
+        	// Load widget data, providing default values on loads before state
+        	// has been saved on the server.
+        	sakai.api.Widgets.loadWidgetData(tuid, 
+        			defaultingStateLoadHandler(callback, {
+        				unconfigured: true,
+        				title: "",
+            			url: "",
+            			daysFrom: DEFAULT_DISPLAY_RANGE[0],
+            			daysTo: DEFAULT_DISPLAY_RANGE[1]
+        			}));
         }
         
         /////////////////////////
