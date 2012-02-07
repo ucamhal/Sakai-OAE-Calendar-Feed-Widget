@@ -1,4 +1,4 @@
-// load the master sakai object to access all Sakai OAE API methods
+	// load the master sakai object to access all Sakai OAE API methods
 require(["jquery", 
          "sakai/sakai.api.core",
          "/devwidgets/lecturelist/javascript/jquery.ui.slider.js"], 
@@ -212,6 +212,7 @@ require(["jquery",
         	
         	var rendered = sakai.api.Util.TemplateRenderer("#agenda_template", {
 				title: _title,
+				webcalFeedUrl: rewriteHttpUrlToWebcal(_feedUrl),
 				days: _groupedDays
 			});
         	
@@ -220,6 +221,12 @@ require(["jquery",
         			expandCalendarEntry, contractCalendarEntry);
         	$(".loading", $rootel).hide();
         	$(".ajax-content", $rootel).show();
+        	
+        	$("#title", $rootel).hover(function() {
+        		$(this).children().fadeIn();
+        	}, function(){
+        		$(this).children().fadeOut();	
+        	})
         }
         
         function buildTimeString(date) {
@@ -319,14 +326,23 @@ require(["jquery",
         settingsFormUrlField.change(function() {
         	var urltext = $(this).val();
         	// Help people inputting webcal:// links by rewriting them to http
-        	urltext = urltext.replace(/^webcal:\/\//, "http://")
+        	urltext = rewriteWebcalUrlToHttp(urltext);
         	$(this).val(urltext);
         });
+        
+        function rewriteWebcalUrlToHttp(url) {
+        	return url.replace(/^webcal:\/\//, "http://");
+        }
+        
+        function rewriteHttpUrlToWebcal(url) {
+        	return url.replace(/^http:\/\//, "webcal://");
+        }
 
         function onWidgetSettingsStateAvailable(success, state) {
         	if(success) {
 	        	settingsFormTitleField.val(state.title);
 	        	settingsFormUrlField.val(state.url);
+	        	
         	}
         	else {
         		alert("Error fetching saved settings");
@@ -337,7 +353,9 @@ require(["jquery",
         function settingsSave() {
         	var state = {
         			title: settingsFormTitleField.val(),
-        			url: settingsFormUrlField.val()
+        			url: settingsFormUrlField.val(),
+        			daysFrom: _settingsDateRange[0],
+        			daysTo: _settingsDateRange[1]
         	};
         	
         	// async save our widget's state
