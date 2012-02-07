@@ -340,13 +340,18 @@ require(["jquery",
 
         function onWidgetSettingsStateAvailable(success, state) {
         	if(success) {
-	        	settingsFormTitleField.val(state.title);
-	        	settingsFormUrlField.val(state.url);
-	        	
+        		var title = state.title;
+        		var url = state.url;
+	        	_settingsDateRange = [state.daysFrom, state.daysTo];
         	}
         	else {
         		alert("Error fetching saved settings");
         	}
+        	settingsFormTitleField.val(title || "");
+        	settingsFormUrlField.val(url || "");
+        	setupRangeSlider($("#daterangeslider", $rootel), 
+            		settingsHandleRangeSlide);
+        	$("#daterangeslider", $rootel).slider("values", _settingsDateRange || DEFAULT_DISPLAY_RANGE)
         }
 
         /** Add listener to setting form submit */
@@ -387,10 +392,11 @@ require(["jquery",
         function setupRangeSlider(container, slideFunc) {
         	$("#daterangeslider", $rootel).slider({
         		range: true,
-        		min: -61,
-        		max: 61,
-        		values: DEFAULT_DISPLAY_RANGE,
-        		slide: slideFunc
+        		min: MIN_SLIDER_DATE,
+        		max: MAX_SLIDER_DATE,
+        		values: _settingsDateRange || DEFAULT_DISPLAY_RANGE,
+        		slide: slideFunc,
+        		change: slideFunc
         	});
         }
         
@@ -420,14 +426,14 @@ require(["jquery",
             	var validateOpts = { submitHandler: settingsSave };
                 sakai.api.Util.Forms.validate(settingsForm, validateOpts, true);
             	
+                $("#lecturelist_settings_save", $rootel).click(function() {
+                	settingsForm.submit();
+                });
                 // Hook up the cancel button
                 $("#lecturelist_settings_cancel", $rootel).click(function(){
             		sakai.api.Widgets.Container.informCancel(
             				tuid, "lecturelist");
             	});
-                
-                setupRangeSlider($("#daterangeslider", $rootel), 
-                		settingsHandleRangeSlide);
                 
                 // Async fetch widget settings to populate form
                 getState(onWidgetSettingsStateAvailable);
