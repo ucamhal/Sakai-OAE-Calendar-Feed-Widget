@@ -396,14 +396,18 @@ require(["jquery",
          * Initialization function DOCUMENTATION
          */
         var doInit = function () {
-            console.log("lecturelist doInit()");
             
             if (showSettings) {
-            	
-            	// Setup validation on settings form
+            	// Setup validation/save handler on save button
             	var validateOpts = { submitHandler: settingsSave };
                 sakai.api.Util.Forms.validate(settingsForm, validateOpts, true);
             	
+                // Hook up the cancel button
+                $("#lecturelist_settings_cancel", $rootel).click(function(){
+            		sakai.api.Widgets.Container.informCancel(
+            				tuid, "lecturelist");
+            	});
+                
                 setupRangeSlider($("#daterangeslider", $rootel), 
                 		settingsHandleRangeSlide);
                 
