@@ -1,10 +1,10 @@
 // load the master sakai object to access all Sakai OAE API methods
 require(["jquery", 
-         "sakai/sakai.api.core", 
-         "/devwidgets/lecturelist/javascript/jquery.icalendar.js",
-         "/devwidgets/lecturelist/javascript/parseuri.js"], 
-        function($, sakai) {
+         "sakai/sakai.api.core",
+         "/devwidgets/lecturelist/javascript/jquery.ui.slider.js"], 
+        function($, sakai, jqui) {
 	
+	console.log({jquery: $});
     /**
      * @name sakai.WIDGET_ID
      *
@@ -39,6 +39,9 @@ require(["jquery",
         var _title = null;
         var _feedUrl = null;
         var _groupedDays = null;
+        
+        // Settings state
+        var _settingsDateRange = null;
         
         DAYS = {"0": "Mon",
         		"1": "Tue",
@@ -266,6 +269,22 @@ require(["jquery",
 
         }
         
+        /**
+         * Builds relative date strings which are even more relative than
+         * buildRelativeDateString() in that it doesn't refer to Today/Yesterday
+         * etc which could confuse people in the context of choosing a general
+         * sliding time window to show events inside.
+         */
+        function buildVeryRelativeDateString(delta) {
+        	var days = Math.floor(delta);
+        	if(days == 0)
+        		return "the present day";
+        	else if(days < 0)
+        		return "" + Math.abs(days) + " days in the past";
+        	else // days > 0
+        		return "" + days + " days in the future";
+        }
+        
         function buildAbsoluteDateString(date) {
         	var dayName = DAYS[date.getDay()];
         	var dayNumber = date.getDate();
@@ -317,7 +336,7 @@ require(["jquery",
         /** Add listener to setting form submit */
         function settingsSave() {
         	var state = {
-        			title: 	settingsFormTitleField.val(),
+        			title: settingsFormTitleField.val(),
         			url: settingsFormUrlField.val()
         	};
         	
@@ -342,6 +361,37 @@ require(["jquery",
         // Initialisation function //
         /////////////////////////////
         
+        // By default show events from 2 days ago up to 2 weeks in the future
+        var DEFAULT_DISPLAY_RANGE = [-2, 14];
+        var MIN_SLIDER_DATE = -61;
+        var MAX_SLIDER_DATE = 61;
+        
+        function setupRangeSlider(container, slideFunc) {
+        	$("#daterangeslider", $rootel).slider({
+        		range: true,
+        		min: -61,
+        		max: 61,
+        		values: DEFAULT_DISPLAY_RANGE,
+        		slide: slideFunc
+        	});
+        }
+        
+        function settingsHandleRangeSlide(event, ui) {
+        	_settingsDateRange = ui.values;
+        	var from = ui.values[0];
+        	var to = ui.values[1];
+        	
+        	var fromString = from <= MIN_SLIDER_DATE ? "any date in the past"
+        			: buildVeryRelativeDateString(from);
+        	var toString = to >= MAX_SLIDER_DATE ? "any date in the future"
+        			: buildVeryRelativeDateString(to);
+        	
+        	$("#lecturelist_settings_daterangeslider_label .from", $rootel)
+        		.text(fromString);
+        	$("#lecturelist_settings_daterangeslider_label .to", $rootel)
+        		.text(toString);
+        }
+        
         /**
          * Initialization function DOCUMENTATION
          */
@@ -354,6 +404,9 @@ require(["jquery",
             	var validateOpts = { submitHandler: settingsSave };
                 sakai.api.Util.Forms.validate(settingsForm, validateOpts, true);
             	
+                setupRangeSlider($("#daterangeslider", $rootel), 
+                		settingsHandleRangeSlide);
+                
                 // Async fetch widget settings to populate form
                 getState(onWidgetSettingsStateAvailable);
                 

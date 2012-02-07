@@ -146,3 +146,100 @@ table { margin: 0; }
  * Settings View CSS
  */
  
+.ui-widget:focus, .ui-widget *:focus {
+	outline: none;
+}
+
+.lecturelist_widget .ui-slider {
+	margin: 0.8em;
+	
+	border-radius: 5px 5px 5px 5px;
+	-moz-border-radius: 5px 5px 5px 5px;
+	-webkit-border-radius: 5px 5px 5px 5px;
+	border: 1px solid #CFCFCF;
+	background: #E3E3E3;
+}
+.lecturelist_widget .ui-slider-range {
+	
+	/* #56c8fa
+	#11a0df
+	border: 1px solid #FF8F2E; */
+	
+	background: #56c8fa; /* Old browsers */
+	background: -moz-linear-gradient(top,  #ffffff 0%, #56c8fa 2%, #11a0df 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(2%,#56c8fa), color-stop(100%,#11a0df)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #ffffff 0%,#56c8fa 2%,#11a0df 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #ffffff 0%,#56c8fa 2%,#11a0df 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #ffffff 0%,#56c8fa 2%,#11a0df 100%); /* IE10+ */
+	background: linear-gradient(top,  #ffffff 0%,#56c8fa 2%,#11a0df 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#11a0df',GradientType=0 ); /* IE6-9 */
+
+}
+.lecturelist_widget .ui-slider-handle {
+	border-radius: 5px 5px 5px 5px;
+	-moz-border-radius: 5px 5px 5px 5px;
+	-webkit-border-radius: 5px 5px 5px 5px;
+	
+	background: white;
+	border: 1px solid #E0E3E5;
+	box-shadow: 0 0 4px -2px #a8a8a8 inset;
+	-moz-box-shadow: 0 0 4px -2px #a8a8a8 inset; 
+	-webkit-box-shadow: 0 0 4px -2px #a8a8a8 inset;
+}
+.lecturelist_widget .ui-slider-handle.ui-state-focus {	
+	background-color: #DFE8EB;
+	border: 1px solid #A4B8BF;
+}
+.lecturelist_widget .ui-slider-handle.ui-state-hover {
+	-webkit-box-shadow: 0 0 1px 1px #C9E8F2;
+}
+
+.lecturelist_widget .ui-slider-handle.ui-state-active {
+	background-color: #DFE8EB;
+	border: 1px solid #A4B8BF;
+	box-shadow: 0 0 3px 1px #A7C3CC;
+	-moz-box-shadow: 0 0 3px 1px #A7C3CC;
+	-webkit-box-shadow: 0 0 3px 1px #A7C3CC;
+}
+
+.lecturelist_widget #lecturelist_settings_daterangeslider_label .date {
+	font-weight: bold;
+}
+
+.lecturelist_widget .date-slider-wrapper {
+	padding: 5px;
+	margin-bottom: 15px;
+	width: 98%;
+	float: left;
+	clear: both;
+	border: 1px solid darkGray;
+}
+
+/* ==========================================================================
+   JQuery UI Slider css
+   ========================================================================== */
+
+/*
+ * jQuery UI Slider 1.8.17
+ *
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Slider#theming
+ */
+.ui-slider { position: relative; text-align: left; }
+.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
+.ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
+
+.ui-slider-horizontal { height: .8em; }
+.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
+.ui-slider-horizontal .ui-slider-range { top: 0; height: 100%; }
+.ui-slider-horizontal .ui-slider-range-min { left: 0; }
+.ui-slider-horizontal .ui-slider-range-max { right: 0; }
+
+.ui-slider-vertical { width: .8em; height: 100px; }
+.ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
+.ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
+.ui-slider-vertical .ui-slider-range-min { bottom: 0; }
+.ui-slider-vertical .ui-slider-range-max { top: 0; }

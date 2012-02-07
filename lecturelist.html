@@ -111,6 +111,14 @@
                     <input type="text" id="lecturelist_settings_txtTitle" name="rss_settings_txtTitle" class="required s3d-input-full-width" />
                     <label for="lecturelist_settings_txtUrl" class="s3d-input-label s3d-input-label-above">Calendar URL (iCalendar):</label>
                     <input type="text" id="lecturelist_settings_txtUrl" name="rss_settings_txtUrl" class="required url s3d-input-full-width" />
+                    
+                    <label class="s3d-input-label s3d-input-label-above">Event display range:</label>
+                    <div class="date-slider-wrapper">
+                        <label id="lecturelist_settings_daterangeslider_label">Events will be shown from <span class="date from">yesterday</span> to <span class="date to">tomorrow</span>.</label>
+                        <!-- populated by jqueryui -->
+                        <div id="daterangeslider">
+                        </div>
+                    </div>
                     <button type="submit" class="s3d-button s3d-header-button rss_settings_btnAddUrl">Save</button>
                 </div>
             </form>
