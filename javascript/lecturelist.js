@@ -23,6 +23,12 @@ require(["jquery",
 			
 		var LECTURE_ENTRY = $("#lecturelist_templates .entry", $rootel);
 		var AGENDA_ROW = $("#lecturelist_templates .agenda-row", $rootel);
+		
+        // By default show events from 2 days ago up to 2 weeks in the future
+        var DEFAULT_DISPLAY_RANGE = [-2, 14];
+        var MIN_SLIDER_DATE = -61;
+        var MAX_SLIDER_DATE = 61;
+        
 		/////////////////////////////
         // Configuration variables //
         /////////////////////////////
@@ -342,7 +348,8 @@ require(["jquery",
         	if(success) {
         		var title = state.title;
         		var url = state.url;
-	        	_settingsDateRange = [state.daysFrom, state.daysTo];
+        		if(state.daysFrom && state.daysTo)
+        			_settingsDateRange = [state.daysFrom, state.daysTo];
         	}
         	else {
         		alert("Error fetching saved settings");
@@ -383,11 +390,6 @@ require(["jquery",
         /////////////////////////////
         // Initialisation function //
         /////////////////////////////
-        
-        // By default show events from 2 days ago up to 2 weeks in the future
-        var DEFAULT_DISPLAY_RANGE = [-2, 14];
-        var MIN_SLIDER_DATE = -61;
-        var MAX_SLIDER_DATE = 61;
         
         function setupRangeSlider(container, slideFunc) {
         	$("#daterangeslider", $rootel).slider({
