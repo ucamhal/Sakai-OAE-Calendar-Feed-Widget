@@ -35,7 +35,7 @@ require(["jquery",
     	var ERROR_UNCONFIGURED_BODY = 
     		"<p>Looks like this Calendar Feed widget has not yet been " + 
     		"configured. If you're not the owner of it then hold tight. " +
-    		"Hopefully it's owner will configure it soon.</p>" +
+    		"Hopefully its owner will configure it soon.</p>" +
     		
     		"<p>If you <em>are</em> the owner of it, you'll need to start " +
     		"editing this page, then click on the widget in the edit view to " +
