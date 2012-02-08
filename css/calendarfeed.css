@@ -21,7 +21,7 @@
  */
 
 /* Error handling styles */
-.lecturelist_widget .error_container {
+.calendarfeed_widget .error_container {
 	/* width: 40em; */
 	margin-left: auto;
 	margin-right: auto;
@@ -60,7 +60,7 @@
  */
 
 /* padding around all your widget's content */
-.lecturelist_widget .s3d-widget-content {
+.calendarfeed_widget .s3d-widget-content {
 	/* padding: 10px 20px; */
 	color: #333333;
 }
@@ -73,8 +73,8 @@ table { margin: 0; }
 
 /* widget icon (for widgets that may appear on a dashboard) 
    icons are usually around 18 x 18 pixels */
-.lecturelist.s3d-widget .s3d-widget-titlebar .widget_title {
-    background: url('/devwidgets/lecturelist/images/lecturelist_icon.png') 
+.calendarfeed.s3d-widget .s3d-widget-titlebar .widget_title {
+    background: url('/devwidgets/calendarfeed/images/calendarfeed_icon.png') 
         17px 18px no-repeat;
 }
 
@@ -83,101 +83,101 @@ table { margin: 0; }
  * Main View CSS
  */
  
-.lecturelist_widget .center {
+.calendarfeed_widget .center {
 	margin-left: auto;
 	margin-right: auto;
 	display: block;
 }
 
-.lecturelist_widget h1.lecture-subject {
+.calendarfeed_widget h1.lecture-subject {
 	border-bottom: 1px solid #CCC;
 	padding-bottom: 6px;
 }
-.lecturelist_widget h1.lecture-subject *:first-child {
+.calendarfeed_widget h1.lecture-subject *:first-child {
 	vertical-align: top;
 }
 
 
 /* Agenda Table */
 
-.lecturelist_widget table#agenda {
+.calendarfeed_widget table#agenda {
 	border-collapse: collapse;
 	border-spacing: 0;
 	table-layout: fixed;
 	width: 100%;
 }
 
-.lecturelist_widget table#agenda tbody:first-child tr:first-child td {
+.calendarfeed_widget table#agenda tbody:first-child tr:first-child td {
 	border-top: none;
 }
 
-.lecturelist_widget table#agenda tbody tr:first-child td {
+.calendarfeed_widget table#agenda tbody tr:first-child td {
 	border-top: 1px solid #ccc;
 	padding-top: 10px;
 }
 
-.lecturelist_widget table#agenda tbody tr.agenda-row:last-child > td {	
+.calendarfeed_widget table#agenda tbody tr.agenda-row:last-child > td {	
 	padding-bottom: 20px;
 }
 
-.lecturelist_widget td {
+.calendarfeed_widget td {
 	
 	padding: 5px 0 5px 0;
 	
 }
-.lecturelist_widget td.date {
+.calendarfeed_widget td.date {
 	vertical-align: top;
 	font-weight: bold;
 	white-space: nowrap;
 	width: 80px;
 }
 
-.lecturelist_widget td.time {
+.calendarfeed_widget td.time {
 	vertical-align: top;
 	width: 60px;
 }
 
-.lecturelist_widget .description {
+.calendarfeed_widget .description {
 	overflow: hidden;
 }
 
-.lecturelist_widget .summary {
+.calendarfeed_widget .summary {
 	font-weight: bold;
 }
-.lecturelist_widget .compact {
+.calendarfeed_widget .compact {
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;	
 }
-.lecturelist_widget .expandable:before {
+.calendarfeed_widget .expandable:before {
 	content: "[+]";
 	font-size: 0.8em;
 	vertical-align: top;
 	font-family: monospace;
 }
-.lecturelist_widget .contractable:before {
+.calendarfeed_widget .contractable:before {
 	content: "[-]";
 	font-size: 0.8em;
 	vertical-align: top;
 	font-family: monospace;
 }
 
-.lecturelist_widget .description .full {
+.calendarfeed_widget .description .full {
 	display: none;
 	margin: 1em 0em 0em 0em;
 	padding: 0 1em 0 1em;
 	border-left: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.lecturelist_widget .link:hover {
+.calendarfeed_widget .link:hover {
 	text-decoration: underline;
 }
-.lecturelist_widget .link {
+.calendarfeed_widget .link {
 	cursor: pointer;
 	color: #2683bc;
 }
 
-.lecturelist_widget table.info-block {
+.calendarfeed_widget table.info-block {
 	table-layout: auto;
 }
 
@@ -189,7 +189,7 @@ table { margin: 0; }
 	outline: none;
 }
 
-.lecturelist_widget .ui-slider {
+.calendarfeed_widget .ui-slider {
 	margin: 0.8em;
 	
 	border-radius: 5px 5px 5px 5px;
@@ -198,7 +198,7 @@ table { margin: 0; }
 	border: 1px solid #CFCFCF;
 	background: #E3E3E3;
 }
-.lecturelist_widget .ui-slider-range {
+.calendarfeed_widget .ui-slider-range {
 	
 	/* #56c8fa
 	#11a0df
@@ -214,7 +214,7 @@ table { margin: 0; }
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#11a0df',GradientType=0 ); /* IE6-9 */
 
 }
-.lecturelist_widget .ui-slider-handle {
+.calendarfeed_widget .ui-slider-handle {
 	border-radius: 5px 5px 5px 5px;
 	-moz-border-radius: 5px 5px 5px 5px;
 	-webkit-border-radius: 5px 5px 5px 5px;
@@ -225,15 +225,15 @@ table { margin: 0; }
 	-moz-box-shadow: 0 0 4px -2px #a8a8a8 inset; 
 	-webkit-box-shadow: 0 0 4px -2px #a8a8a8 inset;
 }
-.lecturelist_widget .ui-slider-handle.ui-state-focus {	
+.calendarfeed_widget .ui-slider-handle.ui-state-focus {	
 	background-color: #DFE8EB;
 	border: 1px solid #A4B8BF;
 }
-.lecturelist_widget .ui-slider-handle.ui-state-hover {
+.calendarfeed_widget .ui-slider-handle.ui-state-hover {
 	-webkit-box-shadow: 0 0 1px 1px #C9E8F2;
 }
 
-.lecturelist_widget .ui-slider-handle.ui-state-active {
+.calendarfeed_widget .ui-slider-handle.ui-state-active {
 	background-color: #DFE8EB;
 	border: 1px solid #A4B8BF;
 	box-shadow: 0 0 3px 1px #A7C3CC;
@@ -241,11 +241,11 @@ table { margin: 0; }
 	-webkit-box-shadow: 0 0 3px 1px #A7C3CC;
 }
 
-.lecturelist_widget #lecturelist_settings_daterangeslider_label .date {
+.calendarfeed_widget #calendarfeed_settings_daterangeslider_label .date {
 	font-weight: bold;
 }
 
-.lecturelist_widget .date-slider-wrapper {
+.calendarfeed_widget .date-slider-wrapper {
 	padding: 5px;
 	margin-bottom: 15px;
 	width: 98%;

@@ -1,7 +1,7 @@
 	// load the master sakai object to access all Sakai OAE API methods
 require(["jquery", 
          "sakai/sakai.api.core",
-         "/devwidgets/lecturelist/javascript/jquery.ui.slider.js"], 
+         "/devwidgets/calendarfeed/javascript/jquery.ui.slider.js"], 
         function($, sakai) {
 	
     /**
@@ -16,14 +16,14 @@ require(["jquery",
      * @param {String} tuid Unique id of the widget
      * @param {Boolean} showSettings Show the settings of the widget or not
      */
-	sakai_global.lecturelist = function (tuid, showSettings) {
+	sakai_global.calendarfeed = function (tuid, showSettings) {
          
 		console.log("creating widget. showSettings: " + showSettings, this);
 		
 		var ICAL_PROXY_PATH = "/var/proxy/ical.json";
 			
-		var LECTURE_ENTRY = $("#lecturelist_templates .entry", $rootel);
-		var AGENDA_ROW = $("#lecturelist_templates .agenda-row", $rootel);
+		var LECTURE_ENTRY = $("#calendarfeed_templates .entry", $rootel);
+		var AGENDA_ROW = $("#calendarfeed_templates .agenda-row", $rootel);
 		
         // By default show events from 2 days ago up to 2 weeks in the future
         var DEFAULT_DISPLAY_RANGE = [-2, 14];
@@ -90,11 +90,11 @@ require(["jquery",
 		
     	// DOM jQuery Objects
         var $rootel = $("#" + tuid);  // unique container for each widget instance
-        var $mainContainer = $("#lecturelist_main", $rootel);
-        var $settingsContainer = $("#lecturelist_settings", $rootel);
-        var settingsForm = $("#lecturelist_settings_form", $rootel);
-        var settingsFormTitleField = $("#lecturelist_settings_txtTitle", $rootel);
-        var settingsFormUrlField = $("#lecturelist_settings_txtUrl", $rootel);
+        var $mainContainer = $("#calendarfeed_main", $rootel);
+        var $settingsContainer = $("#calendarfeed_settings", $rootel);
+        var settingsForm = $("#calendarfeed_settings_form", $rootel);
+        var settingsFormTitleField = $("#calendarfeed_settings_txtTitle", $rootel);
+        var settingsFormUrlField = $("#calendarfeed_settings_txtUrl", $rootel);
         
         // Widget state vars
         var _title = null;
@@ -570,7 +570,7 @@ require(["jquery",
         function onWidgetSettingsDataSaved(success, data) {
         	if (success) {
         		// Settings finished, switch to Main view
-        		sakai.api.Widgets.Container.informFinish(tuid, "lecturelist");
+        		sakai.api.Widgets.Container.informFinish(tuid, "calendarfeed");
         	} else {
         		sakai.api.Util.notification.show("Couldn't Save Your Settings", 
         				"An error prevented your settings from being saved. "
@@ -604,9 +604,9 @@ require(["jquery",
         	var toString = to >= MAX_SLIDER_DATE ? "any date in the future"
         			: buildVeryRelativeDateString(to);
         	
-        	$("#lecturelist_settings_daterangeslider_label .from", $rootel)
+        	$("#calendarfeed_settings_daterangeslider_label .from", $rootel)
         		.text(fromString);
-        	$("#lecturelist_settings_daterangeslider_label .to", $rootel)
+        	$("#calendarfeed_settings_daterangeslider_label .to", $rootel)
         		.text(toString);
         }
         
@@ -620,13 +620,13 @@ require(["jquery",
             	var validateOpts = { submitHandler: settingsSave };
                 sakai.api.Util.Forms.validate(settingsForm, validateOpts, true);
             	
-                $("#lecturelist_settings_save", $rootel).click(function() {
+                $("#calendarfeed_settings_save", $rootel).click(function() {
                 	settingsForm.submit();
                 });
                 // Hook up the cancel button
-                $("#lecturelist_settings_cancel", $rootel).click(function(){
+                $("#calendarfeed_settings_cancel", $rootel).click(function(){
             		sakai.api.Widgets.Container.informCancel(
-            				tuid, "lecturelist");
+            				tuid, "calendarfeed");
             	});
                 
                 // Async fetch widget settings to populate form
@@ -650,5 +650,5 @@ require(["jquery",
     };
 
     // inform Sakai OAE that this widget has loaded and is ready to run
-    sakai.api.Widgets.widgetLoader.informOnLoad("lecturelist");
+    sakai.api.Widgets.widgetLoader.informOnLoad("calendarfeed");
 });
