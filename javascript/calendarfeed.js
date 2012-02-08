@@ -344,7 +344,8 @@ require(["jquery",
         	for(key in days) {
         		var events = days[key];
         		events.sort(function(a, b){
-        			return a.vevent.DTSTART.milliseconds - b.vevent.DTSTART.milliseconds;
+        			return a.vevent.DTSTART.getTime() - 
+        				b.vevent.DTSTART.getTime();
         		});
         		sortedDays.push([key, events]);
         	}
