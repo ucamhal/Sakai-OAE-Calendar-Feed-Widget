@@ -20,7 +20,7 @@ require(["jquery",
          
 		console.log("creating widget. showSettings: " + showSettings, this);
 		
-		var ICAL_PROXY_PATH = "/var/proxy/ical.json"
+		var ICAL_PROXY_PATH = "/var/proxy/ical.json";
 			
 		var LECTURE_ENTRY = $("#lecturelist_templates .entry", $rootel);
 		var AGENDA_ROW = $("#lecturelist_templates .agenda-row", $rootel);
@@ -29,6 +29,60 @@ require(["jquery",
         var DEFAULT_DISPLAY_RANGE = [-2, 14];
         var MIN_SLIDER_DATE = -61;
         var MAX_SLIDER_DATE = 61;
+        
+        // This doesn't seem to work so I'll hard code the values for now :(
+    	//sakai.api.i18n.getValueForKey("ERROR_UNCONFIGURED_BODY");    	
+    	var ERROR_UNCONFIGURED_BODY = 
+    		"<p>Looks like this Calendar Feed widget has not yet been " + 
+    		"configured. If you're not the owner of it then hold tight. " +
+    		"Hopefully it's owner will configure it soon.</p>" +
+    		
+    		"<p>If you <em>are</em> the owner of it, you'll need to start " +
+    		"editing this page, then click on the widget in the edit view to " +
+    		"access its settings.</p>";
+    	
+    	var ERROR_GETTING_STATE = 
+    		"<p>This widget couldn't get through to its host website. This " +
+    		"site may be experiencing difficulties, or there may be a " +
+    		"problem with your internet connection.</p>" +
+    		
+    		"<p>The chances are this will resolve itself very soon. Press " +
+    		"the retry button and cross your fingers…</p>" +
+    		
+    		"<div><button type='button' id='error_retry_btn' " +
+    		"class='s3d-button s3d-large-button'>Try Again</button></div>";
+    	
+    	var ERROR_GETTING_FEED = 
+    		"<p>This widget couldn't access its calendar feed. The website " +
+    		"the feed is from may be experiencing difficulties, or there may " +
+    		"be a problem with your internet connection.</p>" +
+    		
+    		"<p>The chances are this will resolve itself very soon. Press " +
+    		"the <em>try again</em> button and cross your fingers…</p>" +
+    		
+    		"<div><button type='button' id='error_retry_btn' " +
+    		"class='s3d-button s3d-large-button'>Try Again</button></div>";
+    	
+    	/*
+    	 * This widget couldn't get through to the website. The site may by 
+    	 * experiencing difficulties, or there may be a problem with your 
+    	 * internet connection.
+    	 * 
+    	 * The chances are this will resolve itself very soon. Press the retry
+    	 * button and cross your fingers…
+    	 */
+    	
+    	/* 
+    	 * Some light hearted exclamations to show at the top of the error 
+    	 * box.
+    	 */
+    	var LIGHT_HEARTED_ERROR_TITLES = [
+    	    "Fiddlesticks!",
+    	    "Oh dear…",
+    	    "Dagnabbit!",
+    	    "Oops…",
+    	    "What A Kerfuffle!"
+        ];
         
 		/////////////////////////////
         // Configuration variables //
@@ -78,11 +132,6 @@ require(["jquery",
          */
     	function Event(vevent) {
     		
-    		function paragraphBreak(text) {
-    			// Break the text on blank lines
-    			return text.split(/^\s*$/m);
-    		}
-    		
     		this.vevent = vevent;
     		this.absDate = buildAbsoluteDateString(vevent.DTSTART);
     		this.dayDelta = getDayDelta(TODAY, vevent.DTSTART);
@@ -105,6 +154,11 @@ require(["jquery",
         // Utility functions //
         ///////////////////////
         
+    	function paragraphBreak(text) {
+			// Break the text on blank lines
+			return text.split(/^\s*$/m);
+		}
+    	
     	/**
     	 * Builds a callback function to be passed to loadWidgetData which
     	 * detects load failure due to no previous state being saved and calls
@@ -139,19 +193,86 @@ require(["jquery",
     		}
     	}
     	
+    	function randomErrorTitle() {
+    		var len = LIGHT_HEARTED_ERROR_TITLES.length;
+    		return LIGHT_HEARTED_ERROR_TITLES[Math.floor(Math.random() * len)];
+    	}
+    	
+    	/**
+    	 * Shows an error message with the given error body.
+    	 * postInsertHook will be called once the message has been inserted with
+    	 * the error body as its this value.
+    	 */
+    	function showError(bodyHtml, postInsertHook) {
+    		var rendered = sakai.api.Util.TemplateRenderer(
+    				"#template_error_msg", {
+				title: randomErrorTitle(),
+				body: bodyHtml
+			});
+    		var errorElement = $("#error_msg", $rootel);
+    		$("#error_msg", $rootel).html(rendered).slideDown();
+    		if(postInsertHook)
+    			postInsertHook.call(errorElement);
+    	}
+    	
+    	/**
+    	 * Called when the widget state becomes available to the main widget 
+    	 * (not settings).
+    	 */
         function onStateAvailable(succeeded, state) {
+        	
+        	// Check if the request for our state failed...
         	if(!succeeded) {
-        		alert("Failed to fetch widget state.");
-        		return;
+        		hideLoadingIndicator();
+        		
+        		return showError(ERROR_GETTING_STATE, function(){
+        			$("#error_msg #error_retry_btn", $rootel).click(function() {
+        				// re initialise after finishing hiding the error msg
+        				$(this).slideUp(doInit);
+        			})
+        		});
         	}
         	
+        	// Check if the widget is yet to be configured, and if so show a
+        	// message.
+        	if(state.unconfigured) {
+        		hideLoadingIndicator();
+        		return showError(ERROR_UNCONFIGURED_BODY);        		
+        	}
+        	
+        	// Should be all good!
         	_title = state.title;
         	_feedUrl = state.url;
         	fetchCalendarData();
         }
         
         function fetchCalendarData() {
+        	var failure = function() {
+        		hideLoadingIndicator();
+        		showError(ERROR_GETTING_FEED, function() {
+        			// Bind the "try again" button to hide the error message
+        			// and retry the operation.
+        			$("#error_msg #error_retry_btn", $rootel).click(function() {
+        				
+        				$("#error_msg", $rootel).slideUp(function() {
+            				// Once the error box has slid away, show the 
+        					// loading wheel and fetch the data again.
+            				showLoadingIndicator();
+            				fetchCalendarData();
+            			});
+        			});
+        			
+        		});
+        	};
         	var success = function(data) {
+        		// The proxy's iCalendar post processor is broken -- it returns
+        		// 200 success when it gets a bad response from the origin 
+        		// server... We'll have to attempt to detect failure here:
+        		if(!data) {
+        			return failure();
+        		}
+        		
+        		// Hopefully the data is OK.
         		if(data.vcalendar && data.vcalendar.vevents) {
         			var events = data.vcalendar.vevents;
         			
@@ -171,7 +292,8 @@ require(["jquery",
         	$.ajax({
         		url: ICAL_PROXY_PATH,
         		data: {feedurl: _feedUrl},
-        		success: success});
+        		success: success,
+        		failure: failure});
         }
         
         function parseEventDates(event) {
@@ -269,14 +391,22 @@ require(["jquery",
         	$(".ajax-content", $rootel).html(rendered);
         	$(".ajax-content .summary.compact", $rootel).toggle(
         			expandCalendarEntry, contractCalendarEntry);
-        	$(".loading", $rootel).hide();
-        	$(".ajax-content", $rootel).show();
         	
+        	$(".ajax-content", $rootel).show();
+        	hideLoadingIndicator();
         	$("#title", $rootel).hover(function() {
         		$(this).children().fadeIn();
         	}, function(){
         		$(this).children().fadeOut();	
         	})
+        }
+        
+        function hideLoadingIndicator() {
+        	$(".loading", $rootel).stop().hide();
+        }
+        
+        function showLoadingIndicator() {
+        	$(".loading", $rootel).fadeIn(1000);
         }
         
         function buildTimeString(date) {
@@ -493,7 +623,7 @@ require(["jquery",
                 getState(onStateAvailable);
                 
             	$mainContainer.show();
-            	$(".loading", $rootel).fadeIn(1000);
+            	showLoadingIndicator();
             }
         };
         

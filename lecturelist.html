@@ -100,22 +100,16 @@
             </div>
             <div class="ajax-content" style="/*display: none;*/">
             </div>
-            <div id="#error_not_configured" class="error_container">
-            	<h1 class="error_title">Fiddlesticks!</h1>
+            <div id="error_msg" style="display: none;">
+            </div>
+            <div id="template_error_msg"><!-- 
+            <div class="error_container">
+            	<h1 class="error_title">${title}</h1>
             	<div class="error_content">
-		            <p>Looks like this Calendar Feed widget has not yet been 
-		            configured. If you're not the owner of it then hold tight. 
-		            Hopefully it's owner will configure it soon.</p>
-		            
-		            <p>If you <em>are</em> the owner of it, you'll need to start 
-		            editing this page, then click on the widget in the edit view to 
-		            access its settings.</p>
+		            ${body}
             	</div>
             </div>
-            <div id="#error_fetching_state">
-            </div>
-            <div id="#error_fetching_feed">
-            </div>
+             --></div>
         </div>
         <!-- SETTINGS VIEW -->
         <div id="lecturelist_settings" style="display:none;">

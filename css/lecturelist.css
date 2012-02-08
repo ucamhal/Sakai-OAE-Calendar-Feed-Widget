@@ -25,6 +25,8 @@
 	width: 40em;
 	margin-left: auto;
 	margin-right: auto;
+	margin-bottom: 5px;
+	margin-top: 5px;
 	padding-bottom: 6px;
 	
 	border-radius: 10px 10px 0px 0px;
@@ -34,11 +36,11 @@
 	box-shadow: 0 0 6px 0px #aaa;
 }
 
-.error_container p {
-	margin: 1em;
+.error_container *:not(.error_title) {
+	/* margin: 1em; */
 }
 .error_container .error_content {
-	
+	padding: 0.5em 1.5em 1.5em 1.5em;
 }
 .error_container .error_title {
 	
