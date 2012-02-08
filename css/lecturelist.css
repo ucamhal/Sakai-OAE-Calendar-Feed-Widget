@@ -22,18 +22,24 @@
 
 /* Error handling styles */
 .lecturelist_widget .error_container {
-	width: 40em;
+	/* width: 40em; */
 	margin-left: auto;
 	margin-right: auto;
 	margin-bottom: 5px;
 	margin-top: 5px;
-	padding-bottom: 6px;
+	padding: 14px;
 	
-	border-radius: 10px 10px 0px 0px;
-	-moz-border-radius: 10px 10px 0px 0px;
-	-webkit-border-radius: 10px 10px 0px 0px;
+	border-radius: 4px 4px 4px 4px;
+	-moz-border-radius: 4px 4px 4px 4px;
+	-webkit-border-radius: 4px 4px 4px 4px;
 	
-	box-shadow: 0 0 6px 0px #aaa;
+	/* box-shadow: 0 0 6px 0px #aaa; */
+	
+	background-color: #F2DEDE;
+	border: 1px solid #EED3D7;
+	color: #B94A48;
+/* 	text-shadow: 0.5px 1px 1px white; */
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .error_container *:not(.error_title) {
@@ -43,28 +49,10 @@
 	padding: 0.5em 1.5em 1.5em 1.5em;
 }
 .error_container .error_title {
-	
-	color: white;
-	padding: 8px;
-	font-size: 20px;
-	font-weight: normal;
-	white-space: nowrap;
-	text-align: center;
-	
-	text-shadow: 0px 0px 2px #444;
-	
-	border-radius: 10px 10px 0px 0px;
-	/* -moz-border-radius: 10px 10px 10px 10px;
-	-webkit-border-radius: 10px 10px 10px 10px; */
-	
-	background: #fde7e7; /* Old browsers */
-	background: -moz-linear-gradient(top,  #fde7e7 0%, #fcb7b7 2%, #ff8080 45%, #fd5555 51%, #ed0000 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fde7e7), color-stop(2%,#fcb7b7), color-stop(45%,#ff8080), color-stop(51%,#fd5555), color-stop(100%,#ed0000)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #fde7e7 0%,#fcb7b7 2%,#ff8080 45%,#fd5555 51%,#ed0000 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #fde7e7 0%,#fcb7b7 2%,#ff8080 45%,#fd5555 51%,#ed0000 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #fde7e7 0%,#fcb7b7 2%,#ff8080 45%,#fd5555 51%,#ed0000 100%); /* IE10+ */
-	background: linear-gradient(top,  #fde7e7 0%,#fcb7b7 2%,#ff8080 45%,#fd5555 51%,#ed0000 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde7e7', endColorstr='#ed0000',GradientType=0 ); /* IE6-9 */
+	color: inherit;
+	font-weight: bold;
+	margin-bottom: 6px;
+	font-size: 16px;
 }
 
 /*
@@ -73,7 +61,7 @@
 
 /* padding around all your widget's content */
 .lecturelist_widget .s3d-widget-content {
-	padding: 10px 20px;
+	/* padding: 10px 20px; */
 	color: #333333;
 }
 
