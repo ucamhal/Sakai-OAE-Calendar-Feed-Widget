@@ -243,6 +243,7 @@ require(["jquery",
         	// Should be all good!
         	_title = state.title;
         	_feedUrl = state.url;
+        	_settingsDateRange = [state.daysFrom, state.daysTo];
         	fetchCalendarData();
         }
         
@@ -280,7 +281,12 @@ require(["jquery",
         			events = $.map(events, parseEventDates);
         			
         			// Filter the events to just those happening today
-        			//events = $.grep(events, notBefore(dateToday()));
+        			var range = (_settingsDateRange||DEFAULT_DISPLAY_RANGE);
+        			var startDate = addDays(dateToday(), range[0]);
+        			// add one as between() excludes the upper endpoint, but the 
+        			// slider is inclusive.
+        			var endDate =   addDays(dateToday(), range[1] + 1);
+        			events = $.grep(events, between(startDate, endDate));
         			
         			// Group the events into a list of groups, one for each day
         			_groupedDays = groupByDay(events);
@@ -319,7 +325,7 @@ require(["jquery",
         
         function between(dateStart, dateEnd) {
         	return function(event) {
-        		return event.dtstart >= dateStart && event.dstart < dateEnd;
+        		return event.DTSTART >= dateStart && event.DTSTART < dateEnd;
         	}
         }
         
@@ -399,6 +405,18 @@ require(["jquery",
         	}, function(){
         		$(this).children().fadeOut();	
         	})
+        }
+        
+        /**
+         * Add some days to a date.
+         * @param date The date to add the days to.
+         * @param days The number of days to add (can be fractional, e.g. 1.6 
+         *             days).
+         */
+        function addDays(date, days) {
+        	var millis = date.getTime();
+        	millis += days * DAY_MILLIS;
+        	return new Date(millis);
         }
         
         function hideLoadingIndicator() {
