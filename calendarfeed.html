@@ -16,6 +16,14 @@
             </h1>
             <div id="calendarfeed_lectures">
               <table id="agenda">
+                {if days.length === 0 && totalFeedEvents > 0}
+                    <div class="info-box warning-box">
+                        <h4 class="info-title">All events hidden by filter</h4>
+                        <p>The widget received calendar events, but all of them 
+                        were out of the date range the widget is configured to 
+                        show.</p>
+                    </div>
+                {/if}
                 {for day in days}
                     {var events = day[1]}
                     <tbody>
@@ -71,27 +79,6 @@
             </div>
             </div>
          --></div>
-        <div id="calendarfeed_templates" style="display: none;">
-            <div class="entry">
-                <div class="main-row">
-                    <span class="lecture-title">Computer Fundamentals</span>
-                    <span class="lecture-presenter">Dr R. K. Harle [rkh23]</span>
-                </div>
-                <div class="secondary-row">
-                    at: <span class="lecture-datetime">Mi6 MWF 10 ; Mi7 F 10</span>,
-                    location: <span class="lecture-location">Arts School, Room A</span>
-                </div>
-            </div>
-            
-            <!-- Table for the sake of making the <tr> valid. -->
-            <table>
-            <tr class="agenda-row">
-                <td rowspan="2" class="date">Mon 3 Feb</td>
-                <td class="time">10-11 am</td>
-                <td class="description">Hunting The Gene, Babbage Lecture Theatre, Dr DK Summers [dks11]</td>
-            </tr>
-            </table>
-        </div>
         
         <!-- MAIN VIEW -->
         <div id="calendarfeed_main" style="display:none;">
@@ -103,8 +90,8 @@
             <div id="error_msg" style="display: none;">
             </div>
             <div id="template_error_msg"><!-- 
-            <div class="error_container">
-            	<h4 class="error_title">${title}</h4>
+            <div class="info-box error-box error_container">
+            	<h4 class="info-title">${title}</h4>
             	${body}
             </div>
              --></div>

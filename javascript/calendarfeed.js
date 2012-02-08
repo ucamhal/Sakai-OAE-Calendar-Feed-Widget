@@ -118,6 +118,7 @@ require(["jquery",
         var _title = null;
         var _feedUrl = null;
         var _groupedDays = null;
+        var _totalFeedEvents = null;
         
         // Settings state
         var _settingsDateRange = null;
@@ -294,16 +295,19 @@ require(["jquery",
         		// Hopefully the data is OK.
         		if(data.vcalendar && data.vcalendar.vevents) {
         			var events = data.vcalendar.vevents;
+        			_totalFeedEvents = events.length;
         			
         			// Convert event date strings into date objects
         			events = $.map(events, parseEventDates);
         			
         			// Filter the events to just those happening today
         			var range = (_settingsDateRange||DEFAULT_DISPLAY_RANGE);
-        			var startDate = addDays(dateToday(), range[0]);
+        			var startDate = isFinite(range[0]) ? 
+        					addDays(dateToday(), range[0]) : null;
         			// add one as between() excludes the upper endpoint, but the 
         			// slider is inclusive.
-        			var endDate =   addDays(dateToday(), range[1] + 1);
+        			var endDate = isFinite(range[1]) ? 
+        					addDays(dateToday(), range[1] + 1) : null;
         			events = $.grep(events, between(startDate, endDate));
         			
         			// Group the events into a list of groups, one for each day
@@ -318,6 +322,10 @@ require(["jquery",
         		data: {feedurl: _feedUrl},
         		success: success,
         		failure: failure});
+        }
+        
+        function isFinite(dayDelta) {
+        	return dayDelta < MAX_SLIDER_DATE && dayDelta > MIN_SLIDER_DATE;
         }
         
         function parseEventDates(event) {
@@ -343,7 +351,18 @@ require(["jquery",
         
         function between(dateStart, dateEnd) {
         	return function(event) {
-        		return event.DTSTART >= dateStart && event.DTSTART < dateEnd;
+        		if(dateStart && dateEnd) {
+        			return event.DTSTART >= dateStart && event.DTSTART < dateEnd;        			
+        		}
+        		else if(dateStart) {
+        			return event.DTSTART >= dateStart;        			
+        		}
+        		else if(dateEnd) {
+        			return event.DTSTART < dateEnd;        			
+        		}
+        		else {
+        			return true;
+        		}
         	}
         }
         
@@ -410,7 +429,8 @@ require(["jquery",
         	var rendered = sakai.api.Util.TemplateRenderer("#agenda_template", {
 				title: _title,
 				webcalFeedUrl: rewriteHttpUrlToWebcal(_feedUrl),
-				days: _groupedDays
+				days: _groupedDays,
+				totalFeedEvents: _totalFeedEvents
 			});
         	
         	$(".ajax-content", $rootel).html(rendered);
@@ -618,9 +638,9 @@ require(["jquery",
         	var from = ui.values[0];
         	var to = ui.values[1];
         	
-        	var fromString = from <= MIN_SLIDER_DATE ? "any date in the past"
+        	var fromString = !isFinite(from) ? "any date in the past"
         			: buildVeryRelativeDateString(from);
-        	var toString = to >= MAX_SLIDER_DATE ? "any date in the future"
+        	var toString = !isFinite(to) ? "any date in the future"
         			: buildVeryRelativeDateString(to);
         	
         	$("#calendarfeed_settings_daterangeslider_label .from", $rootel)

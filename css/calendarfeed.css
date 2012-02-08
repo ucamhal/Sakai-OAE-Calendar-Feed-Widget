@@ -21,7 +21,7 @@
  */
 
 /* Error handling styles */
-.calendarfeed_widget .error_container {
+.calendarfeed_widget .info-box {
 	/* width: 40em; */
 	margin-left: auto;
 	margin-right: auto;
@@ -33,22 +33,25 @@
 	-moz-border-radius: 4px 4px 4px 4px;
 	-webkit-border-radius: 4px 4px 4px 4px;
 	
-	/* box-shadow: 0 0 6px 0px #aaa; */
-	
-	background-color: #F2DEDE;
-	border: 1px solid #EED3D7;
-	color: #B94A48;
-/* 	text-shadow: 0.5px 1px 1px white; */
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-.error_container *:not(.error_title) {
-	/* margin: 1em; */
+.calendarfeed_widget .error-box {
+	background-color: #F2DEDE;
+	border: 1px solid #EED3D7;
+	color: #B94A48;
 }
-.error_container .error_content {
+
+.calendarfeed_widget .warning-box {
+	background-color: #F2EFDE;
+	border: 1px solid #EEEAD3;
+	color: #9E8E1E;
+}
+
+.info-box .error_content {
 	padding: 0.5em 1.5em 1.5em 1.5em;
 }
-.error_container .error_title {
+.info-box .info-title {
 	color: inherit;
 	font-weight: bold;
 	margin-bottom: 6px;
