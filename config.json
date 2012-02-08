@@ -37,17 +37,17 @@
  *    when Sakai OAE wants to display the widget
  */
 {
-    "id":                 "lecturelist",
+    "id":                 "calendarfeed",
     "type":               "sakai",
     "enabled":            true,
     "hasSettings":        true,
-    "url":                "/devwidgets/lecturelist/lecturelist.html",
-    "img":                "/devwidgets/lecturelist/images/lecturelist.png",
+    "url":                "/devwidgets/calendarfeed/calendarfeed.html",
+    "img":                "/devwidgets/calendarfeed/images/calendarfeed.png",
     "i18n": {
         "default": {
-            "bundle":     "/devwidgets/lecturelist/bundles/default.properties",
-            "name":       "Lecture List",
-            "description":"This is a description of the Lecture List widget."
+            "bundle":     "/devwidgets/calendarfeed/bundles/default.properties",
+            "name":       "Calendar Feed",
+            "description":"Calendar Feed"
         }
     },
     "personalportal":     true,
