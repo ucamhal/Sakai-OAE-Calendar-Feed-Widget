@@ -20,6 +20,51 @@
  * is to organize your CSS into sections like these (or add new sections)
  */
 
+/* Error handling styles */
+.lecturelist_widget .error_container {
+	width: 40em;
+	margin-left: auto;
+	margin-right: auto;
+	padding-bottom: 6px;
+	
+	border-radius: 10px 10px 0px 0px;
+	-moz-border-radius: 10px 10px 0px 0px;
+	-webkit-border-radius: 10px 10px 0px 0px;
+	
+	box-shadow: 0 0 6px 0px #aaa;
+}
+
+.error_container p {
+	margin: 1em;
+}
+.error_container .error_content {
+	
+}
+.error_container .error_title {
+	
+	color: white;
+	padding: 8px;
+	font-size: 20px;
+	font-weight: normal;
+	white-space: nowrap;
+	text-align: center;
+	
+	text-shadow: 0px 0px 2px #444;
+	
+	border-radius: 10px 10px 0px 0px;
+	/* -moz-border-radius: 10px 10px 10px 10px;
+	-webkit-border-radius: 10px 10px 10px 10px; */
+	
+	background: #fde7e7; /* Old browsers */
+	background: -moz-linear-gradient(top,  #fde7e7 0%, #fcb7b7 2%, #ff8080 45%, #fd5555 51%, #ed0000 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fde7e7), color-stop(2%,#fcb7b7), color-stop(45%,#ff8080), color-stop(51%,#fd5555), color-stop(100%,#ed0000)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #fde7e7 0%,#fcb7b7 2%,#ff8080 45%,#fd5555 51%,#ed0000 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #fde7e7 0%,#fcb7b7 2%,#ff8080 45%,#fd5555 51%,#ed0000 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #fde7e7 0%,#fcb7b7 2%,#ff8080 45%,#fd5555 51%,#ed0000 100%); /* IE10+ */
+	background: linear-gradient(top,  #fde7e7 0%,#fcb7b7 2%,#ff8080 45%,#fd5555 51%,#ed0000 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde7e7', endColorstr='#ed0000',GradientType=0 ); /* IE6-9 */
+}
+
 /*
  * Widget Container CSS
  */

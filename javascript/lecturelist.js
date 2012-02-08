@@ -18,6 +18,8 @@ require(["jquery",
      */
 	sakai_global.lecturelist = function (tuid, showSettings) {
          
+		console.log("creating widget. showSettings: " + showSettings, this);
+		
 		var ICAL_PROXY_PATH = "/var/proxy/ical.json"
 			
 		var LECTURE_ENTRY = $("#lecturelist_templates .entry", $rootel);
