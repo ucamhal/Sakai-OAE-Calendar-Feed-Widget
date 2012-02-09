@@ -50,11 +50,11 @@
             "description":"Calendar Feed"
         }
     },
-    "personalportal":     true,
+    "personalportal":     false,
     "showinsakaigoodies": true,
     "userpages": true,
-    "userdashboard": true,
+    "userdashboard": false,
     "grouppages": true,
-    "groupdashboard": true,
+    "groupdashboard": false,
     "sakaidocs": true,
 }
