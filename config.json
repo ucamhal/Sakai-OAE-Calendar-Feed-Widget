@@ -38,7 +38,7 @@
  */
 {
     "id":                 "calendarfeed",
-    "type":               "sakai",
+    "type":               "contrib",
     "enabled":            true,
     "hasSettings":        true,
     "url":                "/devwidgets/calendarfeed/calendarfeed.html",
