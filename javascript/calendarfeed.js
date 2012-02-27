@@ -17,11 +17,11 @@
  */
 
 // load the master sakai object to access all Sakai OAE API methods
-require(["jquery", 
+require(["jquery",
          "sakai/sakai.api.core",
-         "/devwidgets/calendarfeed/javascript/jquery.ui.slider.js"], 
+         "/devwidgets/calendarfeed/javascript/jquery.ui.slider.js"],
         function($, sakai) {
-	
+
     /**
      * @name sakai.WIDGET_ID
      *
@@ -35,63 +35,63 @@ require(["jquery",
      * @param {Boolean} showSettings Show the settings of the widget or not
      */
 	sakai_global.calendarfeed = function (tuid, showSettings) {
-         
+
 		console.log("creating widget. showSettings: " + showSettings, this);
-		
+
 		var ICAL_PROXY_PATH = "/var/proxy/ical.json";
-			
+
 		var LECTURE_ENTRY = $("#calendarfeed_templates .entry", $rootel);
 		var AGENDA_ROW = $("#calendarfeed_templates .agenda-row", $rootel);
-		
+
         // By default show events from 2 days ago up to 2 weeks in the future
         var DEFAULT_DISPLAY_RANGE = [-2, 14];
         var MIN_SLIDER_DATE = -61;
         var MAX_SLIDER_DATE = 61;
-        
+
         // This doesn't seem to work so I'll hard code the values for now :(
-    	//sakai.api.i18n.getValueForKey("ERROR_UNCONFIGURED_BODY");    	
-    	var ERROR_UNCONFIGURED_BODY = 
-    		"<p>Looks like this Calendar Feed widget has not yet been " + 
+    	//sakai.api.i18n.getValueForKey("ERROR_UNCONFIGURED_BODY");
+    	var ERROR_UNCONFIGURED_BODY =
+    		"<p>Looks like this Calendar Feed widget has not yet been " +
     		"configured. If you're not the owner of it then hold tight. " +
     		"Hopefully its owner will configure it soon.</p>" +
-    		
+
     		"<p>If you <em>are</em> the owner of it, you'll need to start " +
     		"editing this page, then click on the widget in the edit view to " +
     		"access its settings.</p>";
-    	
-    	var ERROR_GETTING_STATE = 
+
+    	var ERROR_GETTING_STATE =
     		"<p>This widget couldn't get through to its host website. This " +
     		"site may be experiencing difficulties, or there may be a " +
     		"problem with your internet connection.</p>" +
-    		
+
     		"<p>The chances are this will resolve itself very soon. Press " +
     		"the retry button and cross your fingers…</p>" +
-    		
+
     		"<div><button type='button' id='error_retry_btn' " +
     		"class='s3d-button s3d-large-button'>Try Again</button></div>";
-    	
-    	var ERROR_GETTING_FEED = 
+
+    	var ERROR_GETTING_FEED =
     		"<p>This widget couldn't access its calendar feed. The website " +
     		"the feed is from may be experiencing difficulties, or there may " +
     		"be a problem with your internet connection.</p>" +
-    		
+
     		"<p>The chances are this will resolve itself very soon. Press " +
     		"the <em>try again</em> button and cross your fingers…</p>" +
-    		
+
     		"<div><button type='button' id='error_retry_btn' " +
     		"class='s3d-button s3d-large-button'>Try Again</button></div>";
-    	
+
     	/*
-    	 * This widget couldn't get through to the website. The site may by 
-    	 * experiencing difficulties, or there may be a problem with your 
+    	 * This widget couldn't get through to the website. The site may by
+    	 * experiencing difficulties, or there may be a problem with your
     	 * internet connection.
-    	 * 
+    	 *
     	 * The chances are this will resolve itself very soon. Press the retry
     	 * button and cross your fingers…
     	 */
-    	
-    	/* 
-    	 * Some light hearted exclamations to show at the top of the error 
+
+    	/*
+    	 * Some light hearted exclamations to show at the top of the error
     	 * box.
     	 */
     	var LIGHT_HEARTED_ERROR_TITLES = [
@@ -101,11 +101,11 @@ require(["jquery",
     	    "Oops…",
     	    "What A Kerfuffle!"
         ];
-        
+
 		/////////////////////////////
         // Configuration variables //
         /////////////////////////////
-		
+
     	// DOM jQuery Objects
         var $rootel = $("#" + tuid);  // unique container for each widget instance
         var $mainContainer = $("#calendarfeed_main", $rootel);
@@ -113,16 +113,16 @@ require(["jquery",
         var settingsForm = $("#calendarfeed_settings_form", $rootel);
         var settingsFormTitleField = $("#calendarfeed_settings_txtTitle", $rootel);
         var settingsFormUrlField = $("#calendarfeed_settings_txtUrl", $rootel);
-        
+
         // Widget state vars
         var _title = null;
         var _feedUrl = null;
         var _groupedDays = null;
         var _totalFeedEvents = null;
-        
+
         // Settings state
         var _settingsDateRange = null;
-        
+
         DAYS = {"0": "Mon",
         		"1": "Tue",
         		"2": "Wed",
@@ -143,14 +143,14 @@ require(["jquery",
         		  "9": "Oct",
         		  "10": "Nov",
         		  "11": "Dec"};
-        
+
         var TODAY = dateToday();
-        
+
         /**
          * A class to represent events.
          */
     	function Event(vevent) {
-    		
+
     		this.vevent = vevent;
     		this.absDate = buildAbsoluteDateString(vevent.DTSTART);
     		this.dayDelta = getDayDelta(TODAY, vevent.DTSTART);
@@ -162,37 +162,37 @@ require(["jquery",
     			this.description = "";
     		}
     		this.description = paragraphBreak(this.description);
-    		
+
     		// These fields may be undefined
     		this.url = vevent.URL;
     		this.location = vevent.LOCATION;
     		this.contact = vevent.CONTACT;
     	}
-        
+
         ///////////////////////
         // Utility functions //
         ///////////////////////
-        
+
     	function paragraphBreak(text) {
 			// Break the text on blank lines
 			return text.split(/^\s*$/m);
 		}
-    	
+
     	/**
     	 * Builds a callback function to be passed to loadWidgetData which
     	 * detects load failure due to no previous state being saved and calls
     	 * the callback with success and some default values instead of failure.
-    	 * 
+    	 *
     	 * By default, loadWidgetData makes no distinction between
-    	 * failure to load state due to the widget being loaded for the first 
-    	 * time, and failure due to network error (for example). 
+    	 * failure to load state due to the widget being loaded for the first
+    	 * time, and failure due to network error (for example).
     	 */
     	function defaultingStateLoadHandler(callback, defaults) {
     		// Return a callback function to be registered with loadWidgetData
     		return function(success, obj) {
     			if(!success) {
     				var xhr = obj;
-    				
+
     				// Check for failure to load due to no previous state being
     				// saved. i.e. use defaults.
     				if(xhr.status === 404) {
@@ -200,7 +200,7 @@ require(["jquery",
     					// using the defaults provided
     					callback(true, defaults);
     				}
-    				else {    					
+    				else {
 	    				// Otherwise, assume it's a legitimate failure
 	    				callback(false, xhr);
     				}
@@ -208,15 +208,15 @@ require(["jquery",
     			else {
     				callback(true, obj);
     			}
-    			
+
     		}
     	}
-    	
+
     	function randomErrorTitle() {
     		var len = LIGHT_HEARTED_ERROR_TITLES.length;
     		return LIGHT_HEARTED_ERROR_TITLES[Math.floor(Math.random() * len)];
     	}
-    	
+
     	/**
     	 * Shows an error message with the given error body.
     	 * postInsertHook will be called once the message has been inserted with
@@ -233,17 +233,17 @@ require(["jquery",
     		if(postInsertHook)
     			postInsertHook.call(errorElement);
     	}
-    	
+
     	/**
-    	 * Called when the widget state becomes available to the main widget 
+    	 * Called when the widget state becomes available to the main widget
     	 * (not settings).
     	 */
         function onStateAvailable(succeeded, state) {
-        	
+
         	// Check if the request for our state failed...
         	if(!succeeded) {
         		hideLoadingIndicator();
-        		
+
         		return showError(ERROR_GETTING_STATE, function(){
         			$("#error_msg #error_retry_btn", $rootel).click(function() {
         				// re initialise after finishing hiding the error msg
@@ -251,21 +251,21 @@ require(["jquery",
         			})
         		});
         	}
-        	
+
         	// Check if the widget is yet to be configured, and if so show a
         	// message.
         	if(state.unconfigured) {
         		hideLoadingIndicator();
-        		return showError(ERROR_UNCONFIGURED_BODY);        		
+        		return showError(ERROR_UNCONFIGURED_BODY);
         	}
-        	
+
         	// Should be all good!
         	_title = state.title;
         	_feedUrl = state.url;
         	_settingsDateRange = [state.daysFrom, state.daysTo];
         	fetchCalendarData();
         }
-        
+
         function fetchCalendarData() {
         	var failure = function() {
         		hideLoadingIndicator();
@@ -273,67 +273,67 @@ require(["jquery",
         			// Bind the "try again" button to hide the error message
         			// and retry the operation.
         			$("#error_msg #error_retry_btn", $rootel).click(function() {
-        				
+
         				$("#error_msg", $rootel).slideUp(function() {
-            				// Once the error box has slid away, show the 
+            				// Once the error box has slid away, show the
         					// loading wheel and fetch the data again.
             				showLoadingIndicator();
             				fetchCalendarData();
             			});
         			});
-        			
+
         		});
         	};
         	var success = function(data) {
         		// The proxy's iCalendar post processor is broken -- it returns
-        		// 200 success when it gets a bad response from the origin 
+        		// 200 success when it gets a bad response from the origin
         		// server... We'll have to attempt to detect failure here:
         		if(!data) {
         			return failure();
         		}
-        		
+
         		// Hopefully the data is OK.
         		if(data.vcalendar && data.vcalendar.vevents) {
         			var events = data.vcalendar.vevents;
         			_totalFeedEvents = events.length;
-        			
+
         			// Convert event date strings into date objects
         			events = $.map(events, parseEventDates);
-        			
+
         			// Filter the events to just those happening today
         			var range = (_settingsDateRange||DEFAULT_DISPLAY_RANGE);
-        			var startDate = isFinite(range[0]) ? 
+        			var startDate = isFinite(range[0]) ?
         					addDays(dateToday(), range[0]) : null;
-        			// add one as between() excludes the upper endpoint, but the 
+        			// add one as between() excludes the upper endpoint, but the
         			// slider is inclusive.
-        			var endDate = isFinite(range[1]) ? 
+        			var endDate = isFinite(range[1]) ?
         					addDays(dateToday(), range[1] + 1) : null;
         			events = $.grep(events, between(startDate, endDate));
-        			
+
         			// Group the events into a list of groups, one for each day
         			_groupedDays = groupByDay(events);
-        			
+
         		}
         		updateCalendar();
         	};
-        	
+
         	$.ajax({
         		url: ICAL_PROXY_PATH,
         		data: {feedurl: _feedUrl},
         		success: success,
         		failure: failure});
         }
-        
+
         function isFinite(dayDelta) {
         	return dayDelta < MAX_SLIDER_DATE && dayDelta > MIN_SLIDER_DATE;
         }
-        
+
         function parseEventDates(event) {
         	event.DTSTART = new Date(event.DTSTART);
         	event.DTEND = new Date(event.DTEND);
         	return event;
         }
-        
+
         function dateToday() {
         	return stripTime(new Date());
         }
@@ -342,30 +342,30 @@ require(["jquery",
         	today.setDate(today.getDate() + 1);
         	return today;
         }
-        
+
         function notBefore(date) {
         	return function(event) {
         		return event.DTSTART >= date;
         	}
         }
-        
+
         function between(dateStart, dateEnd) {
         	return function(event) {
         		if(dateStart && dateEnd) {
-        			return event.DTSTART >= dateStart && event.DTSTART < dateEnd;        			
+        			return event.DTSTART >= dateStart && event.DTSTART < dateEnd;
         		}
         		else if(dateStart) {
-        			return event.DTSTART >= dateStart;        			
+        			return event.DTSTART >= dateStart;
         		}
         		else if(dateEnd) {
-        			return event.DTSTART < dateEnd;        			
+        			return event.DTSTART < dateEnd;
         		}
         		else {
         			return true;
         		}
         	}
         }
-        
+
         function groupByDay(vevents) {
         	var days = {}
         	for(var i = 0; i < vevents.length; ++i) {
@@ -381,7 +381,7 @@ require(["jquery",
         	for(key in days) {
         		var events = days[key];
         		events.sort(function(a, b){
-        			return a.vevent.DTSTART.getTime() - 
+        			return a.vevent.DTSTART.getTime() -
         				b.vevent.DTSTART.getTime();
         		});
         		sortedDays.push([key, events]);
@@ -393,23 +393,23 @@ require(["jquery",
         			return 1;
         		return 0;
         	});
-        	
+
         	return sortedDays;
         }
-        
+
         function stripTime(date) {
-        	return new Date(date.getFullYear(), date.getMonth(), 
+        	return new Date(date.getFullYear(), date.getMonth(),
         			date.getDate());
         }
-        
-        /** 
-         * Loads widget saved state, calling the callback(success, data) 
+
+        /**
+         * Loads widget saved state, calling the callback(success, data)
          * function once the state is loaded.
          */
         function getState(callback) {
         	// Load widget data, providing default values on loads before state
         	// has been saved on the server.
-        	sakai.api.Widgets.loadWidgetData(tuid, 
+        	sakai.api.Widgets.loadWidgetData(tuid,
         			defaultingStateLoadHandler(callback, {
         				unconfigured: true,
         				title: "",
@@ -418,38 +418,38 @@ require(["jquery",
             			daysTo: DEFAULT_DISPLAY_RANGE[1]
         			}));
         }
-        
+
         /////////////////////////
         // Main View functions //
         /////////////////////////
 
         /** Called when the calendar data has been updated. */
         function updateCalendar() {
-        	
+
         	var rendered = sakai.api.Util.TemplateRenderer("#agenda_template", {
 				title: _title,
 				webcalFeedUrl: rewriteHttpUrlToWebcal(_feedUrl),
 				days: _groupedDays,
 				totalFeedEvents: _totalFeedEvents
 			});
-        	
+
         	$(".ajax-content", $rootel).html(rendered);
         	$(".ajax-content .summary.compact", $rootel).toggle(
         			expandCalendarEntry, contractCalendarEntry);
-        	
+
         	$(".ajax-content", $rootel).show();
         	hideLoadingIndicator();
         	$("#title", $rootel).hover(function() {
         		$(this).children().fadeIn();
         	}, function(){
-        		$(this).children().fadeOut();	
+        		$(this).children().fadeOut();
         	})
         }
-        
+
         /**
          * Add some days to a date.
          * @param date The date to add the days to.
-         * @param days The number of days to add (can be fractional, e.g. 1.6 
+         * @param days The number of days to add (can be fractional, e.g. 1.6
          *             days).
          */
         function addDays(date, days) {
@@ -457,15 +457,15 @@ require(["jquery",
         	millis += days * DAY_MILLIS;
         	return new Date(millis);
         }
-        
+
         function hideLoadingIndicator() {
         	$(".loading", $rootel).stop().hide();
         }
-        
+
         function showLoadingIndicator() {
         	$(".loading", $rootel).fadeIn(1000);
         }
-        
+
         function buildTimeString(date) {
         	var hour = date.getHours();
         	var minute = "" + date.getMinutes();
@@ -473,23 +473,23 @@ require(["jquery",
         		minute = "0" + minute;
         	return hour + ":" + minute;
         }
-        
+
         // Length of one day in milliseconds
         var DAY_MILLIS = 1000*60*60*24;
         var MAX_DAYS_AGO = 5;
-        
+
         function getDayDelta(from, to) {
         	// Millisecond time @ start of today
-        	var fromms = stripTime(from).getTime(); 
+        	var fromms = stripTime(from).getTime();
         	var toms = stripTime(to).getTime();
         	// Calculate number of days between from and to.
         	return Math.floor((toms - fromms) / DAY_MILLIS);
         }
-        
+
         /**
-         * Builds a relative date string from an integer day delta. Day deltas 
+         * Builds a relative date string from an integer day delta. Day deltas
          * can be calculated by getDayDelta().
-         * 
+         *
          * For example:
          * buildRelativeDateString(0) => "Today"
          * buildRelativeDateString(-1) => "Yesterday"
@@ -512,7 +512,7 @@ require(["jquery",
 				return "In " + days + " days time";
 
         }
-        
+
         /**
          * Builds relative date strings which are even more relative than
          * buildRelativeDateString() in that it doesn't refer to Today/Yesterday
@@ -528,26 +528,26 @@ require(["jquery",
         	else // days > 0
         		return "" + days + " days in the future";
         }
-        
+
         function buildAbsoluteDateString(date) {
         	var dayName = DAYS[date.getDay()];
         	var dayNumber = date.getDate();
         	var monthName = MONTHS[date.getMonth()];
         	return dayName + " " + dayNumber + " " + monthName;
         }
-        
+
         function expandCalendarEntry(jqevent) {
         	var summary = $(this);
         	var expanded = summary.siblings(".full");
-        	
+
         	summary.removeClass("compact expandable").addClass("contractable");
         	expanded.slideDown();
         }
-        
+
         function contractCalendarEntry(jqevent) {
         	var summary = $(this);
         	var expanded = summary.siblings(".full");
-        	
+
         	summary.addClass("compact expandable").removeClass("contractable");
         	expanded.slideUp();
         }
@@ -557,7 +557,7 @@ require(["jquery",
         /////////////////////////////
 
         /**
-         * Watch for value changes to the settings URL field in order to rewrite 
+         * Watch for value changes to the settings URL field in order to rewrite
          * webcal:// urls to http://.
          */
         settingsFormUrlField.change(function() {
@@ -566,11 +566,11 @@ require(["jquery",
         	urltext = rewriteWebcalUrlToHttp(urltext);
         	$(this).val(urltext);
         });
-        
+
         function rewriteWebcalUrlToHttp(url) {
         	return url.replace(/^webcal:\/\//, "http://");
         }
-        
+
         function rewriteHttpUrlToWebcal(url) {
         	return url.replace(/^http:\/\//, "webcal://");
         }
@@ -587,7 +587,7 @@ require(["jquery",
         	}
         	settingsFormTitleField.val(title || "");
         	settingsFormUrlField.val(url || "");
-        	setupRangeSlider($("#daterangeslider", $rootel), 
+        	setupRangeSlider($("#daterangeslider", $rootel),
             		settingsHandleRangeSlide);
         	$("#daterangeslider", $rootel).slider("values", _settingsDateRange || DEFAULT_DISPLAY_RANGE)
         }
@@ -600,28 +600,28 @@ require(["jquery",
         			daysFrom: _settingsDateRange[0],
         			daysTo: _settingsDateRange[1]
         	};
-        	
+
         	// async save our widget's state
-        	sakai.api.Widgets.saveWidgetData(tuid, state, 
+        	sakai.api.Widgets.saveWidgetData(tuid, state,
         			onWidgetSettingsDataSaved);
         }
-        
+
         function onWidgetSettingsDataSaved(success, data) {
         	if (success) {
         		// Settings finished, switch to Main view
         		sakai.api.Widgets.Container.informFinish(tuid, "calendarfeed");
         	} else {
-        		sakai.api.Util.notification.show("Couldn't Save Your Settings", 
+        		sakai.api.Util.notification.show("Couldn't Save Your Settings",
         				"An error prevented your settings from being saved. "
         				+ " Please try again.",
         				sakai.api.Util.notification.type.ERROR);
         	}
         }
-        
+
         /////////////////////////////
         // Initialisation function //
         /////////////////////////////
-        
+
         function setupRangeSlider(container, slideFunc) {
         	$("#daterangeslider", $rootel).slider({
         		range: true,
@@ -632,33 +632,33 @@ require(["jquery",
         		change: slideFunc
         	});
         }
-        
+
         function settingsHandleRangeSlide(event, ui) {
         	_settingsDateRange = ui.values;
         	var from = ui.values[0];
         	var to = ui.values[1];
-        	
+
         	var fromString = !isFinite(from) ? "any date in the past"
         			: buildVeryRelativeDateString(from);
         	var toString = !isFinite(to) ? "any date in the future"
         			: buildVeryRelativeDateString(to);
-        	
+
         	$("#calendarfeed_settings_daterangeslider_label .from", $rootel)
         		.text(fromString);
         	$("#calendarfeed_settings_daterangeslider_label .to", $rootel)
         		.text(toString);
         }
-        
+
         /**
          * Initialization function DOCUMENTATION
          */
         var doInit = function () {
-            
+
             if (showSettings) {
             	// Setup validation/save handler on save button
             	var validateOpts = { submitHandler: settingsSave };
                 sakai.api.Util.Forms.validate(settingsForm, validateOpts, true);
-            	
+
                 $("#calendarfeed_settings_save", $rootel).click(function() {
                 	settingsForm.submit();
                 });
@@ -667,10 +667,10 @@ require(["jquery",
             		sakai.api.Widgets.Container.informCancel(
             				tuid, "calendarfeed");
             	});
-                
+
                 // Async fetch widget settings to populate form
                 getState(onWidgetSettingsStateAvailable);
-                
+
                 // show the Settings view
                 $settingsContainer.show();
             } else {
@@ -678,12 +678,12 @@ require(["jquery",
 
             	// Async fetch widget settings to populate form
                 getState(onStateAvailable);
-                
+
             	$mainContainer.show();
             	showLoadingIndicator();
             }
         };
-        
+
         // run the initialization function when the widget object loads
         doInit();
     };
