@@ -152,18 +152,6 @@ table { margin: 0; }
 	text-overflow: ellipsis;
 	overflow: hidden;	
 }
-.calendarfeed_widget .expandable:before {
-	content: "[+]";
-	font-size: 0.8em;
-	vertical-align: top;
-	font-family: monospace;
-}
-.calendarfeed_widget .contractable:before {
-	content: "[-]";
-	font-size: 0.8em;
-	vertical-align: top;
-	font-family: monospace;
-}
 
 .calendarfeed_widget .description .full {
 	display: none;
@@ -178,6 +166,24 @@ table { margin: 0; }
 .calendarfeed_widget .link {
 	cursor: pointer;
 	color: #2683bc;
+}
+
+.calendarfeed_widget .expandable, .calendarfeed_widget .contractable {
+    background-repeat: no-repeat;
+    background-position-y: top;
+    padding-left: 22px;
+}
+.calendarfeed_widget .expandable {
+    background-image: url(/dev/images/arrow_down_square.png);
+}
+.calendarfeed_widget .contractable {
+    background-image: url(/dev/images/arrow_up_square.png);
+}
+.calendarfeed_widget .expandable:hover {
+    background-image: url(/dev/images/arrow_down_square_hover.png);
+}
+.calendarfeed_widget .contractable:hover {
+    background-image: url(/dev/images/arrow_up_square_hover.png);
 }
 
 .calendarfeed_widget table.info-block {
