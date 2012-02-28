@@ -22,13 +22,6 @@
 var require, sakai_global, alert;
 
 /**
- * @name sakai.WIDGET_ID
- * 
- * @class WIDGET_ID
- * 
- * @description WIDGET DESCRIPTION
- * 
- * @version 0.0.1
  * @param {String}
  *            tuid Unique id of the widget
  * @param {Boolean}
@@ -166,8 +159,6 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         "11" : "Dec"
     };
 
-    var TODAY = dateToday();
-
     /**
      * A class to represent events.
      */
@@ -175,7 +166,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
 
         this.vevent = vevent;
         this.absDate = buildAbsoluteDateString(vevent.DTSTART);
-        this.dayDelta = getDayDelta(TODAY, vevent.DTSTART);
+        this.dayDelta = getDayDelta(dateToday(), vevent.DTSTART);
         this.relDate = buildRelativeDateString(this.dayDelta);
         this.time = buildTimeString(vevent.DTSTART);
         this.summary = vevent.SUMMARY || vevent.DESCRIPTION || "";
