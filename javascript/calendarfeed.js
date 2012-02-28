@@ -256,9 +256,9 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
             hideLoadingIndicator();
 
             return showError(ERROR_GETTING_STATE, function () {
-                $("#error_msg #error_retry_btn", $rootel).click(function () {
+                $("#error_msg #error_retry_btn", $rootel).click(function (e) {
                     // re initialise after finishing hiding the error msg
-                    $(this).slideUp(doInit);
+                    $(e.target).slideUp(doInit);
                 });
             });
         }
@@ -451,10 +451,10 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
 
         $(".ajax-content", $rootel).show();
         hideLoadingIndicator();
-        $("#title", $rootel).hover(function () {
-            $(this).children().fadeIn();
-        }, function () {
-            $(this).children().fadeOut();
+        $("#title", $rootel).hover(function (e) {
+            $(e.target).children().fadeIn();
+        }, function (e) {
+            $(e.target).children().fadeOut();
         });
     };
 
@@ -572,11 +572,11 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
      * Watch for value changes to the settings URL field in order to rewrite
      * webcal:// urls to http://.
      */
-    settingsFormUrlField.change(function () {
-        var urltext = $(this).val();
+    settingsFormUrlField.change(function (e) {
+        var urltext = $(e.target).val();
         // Help people inputting webcal:// links by rewriting them to http
         urltext = rewriteWebcalUrlToHttp(urltext);
-        $(this).val(urltext);
+        $(e.target).val(urltext);
     });
 
     rewriteWebcalUrlToHttp = function (url) {
