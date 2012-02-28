@@ -55,7 +55,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
      * presense are required by external APIs which this code has control over.
      * 
      *  JSLint thinks it's helpful to moan that an argument is unused, even 
-     *  though its use can't be avoided without stupid hacks like using the 
+     *  though its presence can't be avoided without stupid hacks like using the
      *  arguments array.
      */
     var stopJSLintMoaningAboutThisUnusedVarWhichICanDoNothingAbout =
