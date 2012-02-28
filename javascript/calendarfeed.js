@@ -710,7 +710,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
 // load the master sakai object to access all Sakai OAE API methods
 require(
     ["jquery", "sakai/sakai.api.core",
-        "/devwidgets/calendarfeed/javascript/jquery.ui.slider.js"],
+        "/devwidgets/calendarfeed/lib/jquery.ui.slider.js"],
     function (jquery, sakai) {
 
         "use strict";
