@@ -58,6 +58,13 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     var $ = sakai_global.calendarfeed.imports.jquery;
     var sakai = sakai_global.calendarfeed.imports.sakai;
 
+    /**
+     * Get an internationalisation value from the widget's bundle. 
+     */
+    var translationOf = function (key) {
+        return sakai.api.i18n.getValueForKey(key, "calendarfeed");
+    };
+
     var ICAL_PROXY_PATH = "/var/proxy/ical.json";
 
     // By default show events from 2 days ago up to 2 weeks in the future
@@ -68,36 +75,9 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     // Length of one day in milliseconds
     var DAY_MILLIS = 1000 * 60 * 60 * 24;
 
-    // This doesn't seem to work so I'll hard code the values for now :(
-    // sakai.api.i18n.getValueForKey("ERROR_UNCONFIGURED_BODY");
-    var ERROR_UNCONFIGURED_BODY = "<p>Looks like this Calendar Feed widget " +
-            "has not yet been configured. If you're not the owner of it then" +
-            " hold tight. Hopefully its owner will configure it soon.</p>" +
-
-            "<p>If you <em>are</em> the owner of it, you'll need to start " +
-            "editing this page, then click on the widget in the edit view to " +
-            "access its settings.</p>";
-
-    var ERROR_GETTING_STATE = "<p>This widget couldn't get through to its " +
-            "host website. This site may be experiencing difficulties, or " +
-            "there may be a problem with your internet connection.</p>" +
-
-            "<p>The chances are this will resolve itself very soon. Press " +
-            "the retry button and cross your fingers…</p>" +
-
-            "<div><button type='button' id='error_retry_btn' " +
-            "class='s3d-button s3d-large-button'>Try Again</button></div>";
-
-    var ERROR_GETTING_FEED = "<p>This widget couldn't access its calendar " +
-            "feed. The website the feed is from may be experiencing " +
-            "difficulties, or there may be a problem with your internet " +
-            "connection.</p>" +
-
-            "<p>The chances are this will resolve itself very soon. Press " +
-            "the <em>try again</em> button and cross your fingers…</p>" +
-
-            "<div><button type='button' id='error_retry_btn' " +
-            "class='s3d-button s3d-large-button'>Try Again</button></div>";
+    var ERROR_UNCONFIGURED_BODY = translationOf("ERROR_UNCONFIGURED_BODY");
+    var ERROR_GETTING_STATE = translationOf("ERROR_GETTING_STATE");
+    var ERROR_GETTING_FEED = translationOf("ERROR_GETTING_FEED");
 
     /*
      * This widget couldn't get through to the website. The site may by
@@ -110,8 +90,8 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     /*
      * Some light hearted exclamations to show at the top of the error box.
      */
-    var LIGHT_HEARTED_ERROR_TITLES = [ "Fiddlesticks!", "Oh dear…",
-            "Dagnabbit!", "Oops…", "What A Kerfuffle!" ];
+    var LIGHT_HEARTED_ERROR_TITLES =
+        translationOf("LIGHT_HEARTED_ERROR_TITLES").split("//");
 
     // ///////////////////////////
     // Configuration variables //
@@ -596,7 +576,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
                 _settingsDateRange = [ state.daysFrom, state.daysTo ];
             }
         } else {
-            alert("Error fetching saved settings");
+            alert(translationOf("SETTINGS_ERROR_FETCHING_WIDGET_STATE"));
         }
         settingsFormTitleField.val(title || "");
         settingsFormUrlField.val(url || "");
@@ -625,10 +605,11 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
             // Settings finished, switch to Main view
             sakai.api.Widgets.Container.informFinish(tuid, "calendarfeed");
         } else {
-            sakai.api.Util.notification.show("Couldn't Save Your Settings",
-                    "An error prevented your settings from being saved. "
-                            + " Please try again.",
-                    sakai.api.Util.notification.type.ERROR);
+            sakai.api.Util.notification.show(
+                translationOf("SETTINGS_ERROR_SAVING_WIDGET_STATE_TITLE"),
+                translationOf("SETTINGS_ERROR_SAVING_WIDGET_STATE_BODY"),
+                sakai.api.Util.notification.type.ERROR
+            );
         }
     };
 
