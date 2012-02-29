@@ -171,7 +171,8 @@ table { margin: 0; }
 .calendarfeed_widget .expandable, .calendarfeed_widget .contractable {
     background-repeat: no-repeat;
     background-position-y: top;
-    padding-left: 22px;
+    background-position-x: right;
+    padding-right: 22px;
 }
 .calendarfeed_widget .expandable {
     background-image: url(/dev/images/arrow_down_square.png);
