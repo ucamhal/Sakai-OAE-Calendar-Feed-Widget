@@ -120,12 +120,12 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     // ///////////////////////////
 
     // unique container for each widget instance
-    var $rootel = $("#" + tuid);
-    var $mainContainer = $("#calendarfeed_main", $rootel);
-    var $settingsContainer = $("#calendarfeed_settings", $rootel);
-    var settingsForm = $("#calendarfeed_settings_form", $rootel);
-    var settingsFormTitleField = $("#calendarfeed_settings_txtTitle", $rootel);
-    var settingsFormUrlField = $("#calendarfeed_settings_txtUrl", $rootel);
+    var root = $("#" + tuid);
+    var mainContainer = $("#calendarfeed_main", root);
+    var settingsContainer = $("#calendarfeed_settings", root);
+    var settingsForm = $("#calendarfeed_settings_form", root);
+    var settingsFormTitleField = $("#calendarfeed_settings_txtTitle", root);
+    var settingsFormUrlField = $("#calendarfeed_settings_txtUrl", root);
 
     // Widget state vars
     var _title = null;
@@ -222,8 +222,8 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
             title : randomErrorTitle(),
             body : bodyHtml
         });
-        var errorElement = $("#error_msg", $rootel);
-        $("#error_msg", $rootel).html(rendered).slideDown();
+        var errorElement = $("#error_msg", root);
+        $("#error_msg", root).html(rendered).slideDown();
         if (postInsertHook) {
             postInsertHook.call(errorElement);
         }
@@ -240,7 +240,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
             hideLoadingIndicator();
 
             return showError(ERROR_GETTING_STATE, function () {
-                $("#error_msg #error_retry_btn", $rootel).click(function (e) {
+                $("#error_msg #error_retry_btn", root).click(function (e) {
                     // re initialise after finishing hiding the error msg
                     $(e.target).slideUp(doInit);
                 });
@@ -267,9 +267,9 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
             showError(ERROR_GETTING_FEED, function () {
                 // Bind the "try again" button to hide the error message
                 // and retry the operation.
-                $("#error_msg #error_retry_btn", $rootel).click(function () {
+                $("#error_msg #error_retry_btn", root).click(function () {
 
-                    $("#error_msg", $rootel).slideUp(function () {
+                    $("#error_msg", root).slideUp(function () {
                         // Once the error box has slid away, show the
                         // loading wheel and fetch the data again.
                         showLoadingIndicator();
@@ -413,15 +413,15 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
             totalFeedEvents : _totalFeedEvents
         });
 
-        $(".ajax-content", $rootel).html(rendered);
-        $(".ajax-content .summary.compact", $rootel).toggle(
+        $(".ajax-content", root).html(rendered);
+        $(".ajax-content .summary.compact", root).toggle(
             expandCalendarEntry,
             contractCalendarEntry
         );
 
-        $(".ajax-content", $rootel).show();
+        $(".ajax-content", root).show();
         hideLoadingIndicator();
-        $("#title", $rootel).hover(function (e) {
+        $("#title", root).hover(function (e) {
             $(e.target).children().fadeIn();
         }, function (e) {
             $(e.target).children().fadeOut();
@@ -429,11 +429,11 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     };
 
     hideLoadingIndicator = function () {
-        $(".loading", $rootel).stop().hide();
+        $(".loading", root).stop().hide();
     };
 
     showLoadingIndicator = function () {
-        $(".loading", $rootel).fadeIn(1000);
+        $(".loading", root).fadeIn(1000);
     };
 
     expandCalendarEntry = function (e) {
@@ -484,9 +484,9 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         }
         settingsFormTitleField.val(title || "");
         settingsFormUrlField.val(url || "");
-        setupRangeSlider($("#daterangeslider", $rootel),
+        setupRangeSlider($("#daterangeslider", root),
                 settingsHandleRangeSlide);
-        $("#daterangeslider", $rootel).slider("values",
+        $("#daterangeslider", root).slider("values",
                 _settingsDateRange || DEFAULT_DISPLAY_RANGE);
     };
 
@@ -519,7 +519,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
 
     setupRangeSlider = function (container, slideFunc) {
         stopJSLintMoaningAboutThisUnusedVarWhichICanDoNothingAbout(container);
-        $("#daterangeslider", $rootel).slider({
+        $("#daterangeslider", root).slider({
             range : true,
             min : MIN_SLIDER_DATE,
             max : MAX_SLIDER_DATE,
@@ -540,10 +540,10 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         var toString = !isFinite(to) ? "any date in the future"
                 : dates.buildVeryRelativeDateString(to);
 
-        $("#calendarfeed_settings_daterangeslider_label .from", $rootel).text(
+        $("#calendarfeed_settings_daterangeslider_label .from", root).text(
             fromString
         );
-        $("#calendarfeed_settings_daterangeslider_label .to", $rootel).text(
+        $("#calendarfeed_settings_daterangeslider_label .to", root).text(
             toString
         );
     };
@@ -560,11 +560,11 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
             };
             sakai.api.Util.Forms.validate(settingsForm, validateOpts, true);
 
-            $("#calendarfeed_settings_save", $rootel).click(function () {
+            $("#calendarfeed_settings_save", root).click(function () {
                 settingsForm.submit();
             });
             // Hook up the cancel button
-            $("#calendarfeed_settings_cancel", $rootel).click(function () {
+            $("#calendarfeed_settings_cancel", root).click(function () {
                 sakai.api.Widgets.Container.informCancel(tuid, "calendarfeed");
             });
 
@@ -572,14 +572,14 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
             getState(onWidgetSettingsStateAvailable);
 
             // show the Settings view
-            $settingsContainer.show();
+            settingsContainer.show();
         } else {
             // set up Main view
 
             // Async fetch widget settings to populate form
             getState(onStateAvailable);
 
-            $mainContainer.show();
+            mainContainer.show();
             showLoadingIndicator();
         }
     };
