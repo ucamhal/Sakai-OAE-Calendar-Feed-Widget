@@ -1,4 +1,8 @@
 /*
+ * Copyright 2012:
+ *     - Hal Blackburn<hwtb2@caret.cam.ac.uk>
+ *     - CARET, University of Cambridge
+ * 
  * Licensed to the Sakai Foundation (SF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -41,7 +45,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         compareEventByStartDate, getState, buildVeryRelativeDateString,
         rewriteWebcalUrlToHttp, onWidgetSettingsStateAvailable,
         setupRangeSlider, settingsHandleRangeSlide, settingsSave,
-        onWidgetSettingsDataSaved;
+        onWidgetSettingsDataSaved, localiseDate;
 
     /** 
      * No-op function which can be called with unused function arguments whose 
@@ -57,6 +61,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     // Pull require() imports into local scope
     var $ = sakai_global.calendarfeed.imports.jquery;
     var sakai = sakai_global.calendarfeed.imports.sakai;
+    var dates = sakai_global.calendarfeed.imports.dates;
 
     /**
      * Get an internationalisation value from the widget's bundle. 
@@ -165,6 +170,13 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     // /////////////////////
     // Utility functions //
     // /////////////////////
+
+    /**
+     * Converts a date from an UTC into the user's chosen timezone.
+     */
+    localiseDate = function (utcdate) {
+        return sakai.api.l10n.fromGMT(utcdate, sakai.api.User.data.me);
+    };
 
     paragraphBreak = function (text) {
         // Break the text on blank lines
@@ -322,9 +334,13 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         return dayDelta < MAX_SLIDER_DATE && dayDelta > MIN_SLIDER_DATE;
     };
 
+    /**
+     * Convert date strings from a JSON origionating event object into js Date
+     * objects in the current user's prefered time zone.
+     */
     parseEventDates = function (event) {
-        event.DTSTART = new Date(event.DTSTART);
-        event.DTEND = new Date(event.DTEND);
+        event.DTSTART = localiseDate(dates.parseISO8601(event.DTSTART));
+        event.DTEND =   localiseDate(dates.parseISO8601(event.DTEND));
         return event;
     };
 
@@ -690,15 +706,19 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
 
 // load the master sakai object to access all Sakai OAE API methods
 require(
-    ["jquery", "sakai/sakai.api.core",
-        "/devwidgets/calendarfeed/lib/jquery.ui.slider.js"],
-    function (jquery, sakai) {
+    [
+        "jquery", "sakai/sakai.api.core",
+        "/devwidgets/calendarfeed/lib/dates.js",
+        "/devwidgets/calendarfeed/lib/jquery.ui.slider.js"
+    ],
+    function (jquery, sakai, dates) {
 
         "use strict";
 
         sakai_global.calendarfeed.imports = {
             jquery : jquery,
-            sakai : sakai
+            sakai : sakai,
+            dates: dates
         };
 
         // inform Sakai OAE that this widget has loaded and is ready to run
