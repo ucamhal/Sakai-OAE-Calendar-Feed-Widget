@@ -2,7 +2,7 @@
  * Copyright 2012:
  *     - Hal Blackburn<hwtb2@caret.cam.ac.uk>
  *     - CARET, University of Cambridge
- * 
+ *
  * Licensed to the Sakai Foundation (SF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -67,11 +67,11 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         showLoadingIndicator,
         updateCalendar;
 
-    /** 
-     * No-op function which can be called with unused function arguments whose 
+    /**
+     * No-op function which can be called with unused function arguments whose
      * presense are required by external APIs which this code has control over.
-     * 
-     *  JSLint thinks it's helpful to moan that an argument is unused, even 
+     *
+     *  JSLint thinks it's helpful to moan that an argument is unused, even
      *  though its presence can't be avoided without stupid hacks like using the
      *  arguments array.
      */
@@ -84,7 +84,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     var dates = sakai_global.calendarfeed.imports.dates;
 
     /**
-     * Get an internationalisation value from the widget's bundle. 
+     * Get an internationalisation value from the widget's bundle.
      */
     var translationOf = function (key) {
         return sakai.api.i18n.getValueForKey(key, "calendarfeed");
@@ -105,7 +105,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
      * This widget couldn't get through to the website. The site may by
      * experiencing difficulties, or there may be a problem with your internet
      * connection.
-     * 
+     *
      * The chances are this will resolve itself very soon. Press the retry
      * button and cross your fingers…
      */
@@ -179,7 +179,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
      * Builds a callback function to be passed to loadWidgetData which detects
      * load failure due to no previous state being saved and calls the callback
      * with success and some default values instead of failure.
-     * 
+     *
      * By default, loadWidgetData makes no distinction between failure to load
      * state due to the widget being loaded for the first time, and failure due
      * to network error (for example).
