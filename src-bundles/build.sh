@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e # Exit on error
+
 CLOJURE_CMD="clj"
 
 if ! which $CLOJURE_CMD &>/dev/null ; then
