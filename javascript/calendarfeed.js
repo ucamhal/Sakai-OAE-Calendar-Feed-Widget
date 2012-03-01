@@ -26,6 +26,9 @@
 var require, sakai_global, alert;
 
 /**
+ * A Sakai OAE widget which shows calendar events from an iCalendar feed in a
+ * daily agenda list style view.
+ *
  * @param {String}
  *            tuid Unique id of the widget
  * @param {Boolean}
@@ -34,18 +37,35 @@ var require, sakai_global, alert;
 sakai_global.calendarfeed = function (tuid, showSettings) {
     "use strict";
 
-    // More jslint lint: pre-declaring functions ahead of use required...
-    var dateToday, buildAbsoluteDateString, getDayDelta,
-        buildRelativeDateString, buildTimeString, paragraphBreak,
-        hideLoadingIndicator, doInit, fetchCalendarData, showLoadingIndicator,
-        parseEventDates, addDays, between, groupByDay, updateCalendar,
-        stripTime, rewriteHttpUrlToWebcal, expandCalendarEntry,
-        contractCalendarEntry, defaultingStateLoadHandler, randomErrorTitle,
-        showError, onStateAvailable, isFinite, dateTomorrow, notBefore,
-        compareEventByStartDate, getState, buildVeryRelativeDateString,
-        rewriteWebcalUrlToHttp, onWidgetSettingsStateAvailable,
-        setupRangeSlider, settingsHandleRangeSlide, settingsSave,
-        onWidgetSettingsDataSaved, localiseDate;
+    // JSLint complains if we don't declare all our var based functions before
+    // use...
+    var between,
+        compareEventByStartDate,
+        contractCalendarEntry,
+        defaultingStateLoadHandler,
+        doInit,
+        expandCalendarEntry,
+        fetchCalendarData,
+        getState,
+        groupByDay,
+        hideLoadingIndicator,
+        isFinite,
+        localiseDate,
+        notBefore,
+        onStateAvailable,
+        onWidgetSettingsDataSaved,
+        onWidgetSettingsStateAvailable,
+        paragraphBreak,
+        parseEventDates,
+        randomErrorTitle,
+        rewriteHttpUrlToWebcal,
+        rewriteWebcalUrlToHttp,
+        settingsHandleRangeSlide,
+        settingsSave,
+        setupRangeSlider,
+        showError,
+        showLoadingIndicator,
+        updateCalendar;
 
     /** 
      * No-op function which can be called with unused function arguments whose 
@@ -76,9 +96,6 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     var DEFAULT_DISPLAY_RANGE = [ -2, 14 ];
     var MIN_SLIDER_DATE = -61;
     var MAX_SLIDER_DATE = 61;
-
-    // Length of one day in milliseconds
-    var DAY_MILLIS = 1000 * 60 * 60 * 24;
 
     var ERROR_UNCONFIGURED_BODY = translationOf("ERROR_UNCONFIGURED_BODY");
     var ERROR_GETTING_STATE = translationOf("ERROR_GETTING_STATE");
@@ -119,41 +136,16 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
     // Settings state
     var _settingsDateRange = null;
 
-    var DAYS = {
-        "0" : "Mon",
-        "1" : "Tue",
-        "2" : "Wed",
-        "3" : "Thu",
-        "4" : "Fri",
-        "5" : "Sat",
-        "6" : "Sun"
-    };
-
-    var MONTHS = {
-        "0" : "Jan",
-        "1" : "Feb",
-        "2" : "Mar",
-        "3" : "Apr",
-        "4" : "May",
-        "5" : "Jun",
-        "6" : "Jul",
-        "7" : "Aug",
-        "8" : "Sep",
-        "9" : "Oct",
-        "10" : "Nov",
-        "11" : "Dec"
-    };
-
     /**
      * A class to represent events.
      */
     function Event(vevent) {
 
         this.vevent = vevent;
-        this.absDate = buildAbsoluteDateString(vevent.DTSTART);
-        this.dayDelta = getDayDelta(dateToday(), vevent.DTSTART);
-        this.relDate = buildRelativeDateString(this.dayDelta);
-        this.time = buildTimeString(vevent.DTSTART);
+        this.absDate = dates.buildAbsoluteDateString(vevent.DTSTART);
+        this.dayDelta = dates.dayDelta(dates.today(), vevent.DTSTART);
+        this.relDate = dates.buildRelativeDateString(this.dayDelta);
+        this.time = dates.buildTimeString(vevent.DTSTART);
         this.summary = vevent.SUMMARY || vevent.DESCRIPTION || "";
         this.description = vevent.DESCRIPTION || vevent.SUMMARY || "";
         if (this.description === this.summary) {
@@ -305,12 +297,12 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
 
                 // Filter the events to just those happening today
                 var range = (_settingsDateRange || DEFAULT_DISPLAY_RANGE);
-                var startDate = (isFinite(range[0]) ? addDays(dateToday(),
-                        range[0]) : null);
+                var startDate = (isFinite(range[0]) ?
+                        dates.addDays(dates.today(), range[0]) : null);
                 // add one as between() excludes the upper endpoint, but the
                 // slider is inclusive.
-                var endDate = (isFinite(range[1]) ? addDays(dateToday(),
-                        range[1] + 1) : null);
+                var endDate = (isFinite(range[1]) ?
+                        dates.addDays(dates.today(), range[1] + 1) : null);
                 events = $.grep(events, between(startDate, endDate));
 
                 // Group the events into a list of groups, one for each day
@@ -344,16 +336,6 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         return event;
     };
 
-    dateToday = function () {
-        return stripTime(new Date());
-    };
-
-    dateTomorrow = function () {
-        var today = dateToday();
-        today.setDate(today.getDate() + 1);
-        return today;
-    };
-
     notBefore = function (date) {
         return function (event) {
             return event.DTSTART >= date;
@@ -384,7 +366,7 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         for (i = 0; i < vevents.length; ++i) {
             var event = vevents[i];
             // We need a string to key our obj with
-            var dateKey = stripTime(event.DTSTART).toISOString();
+            var dateKey = dates.stripTime(event.DTSTART).toISOString();
             if (!days[dateKey]) {
                 days[dateKey] = [];
             }
@@ -400,10 +382,6 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         }
         sortedDays.sort();
         return sortedDays;
-    };
-
-    stripTime = function (date) {
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     };
 
     /**
@@ -424,10 +402,6 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
             }
         ));
     };
-
-    // ///////////////////////
-    // Main View functions //
-    // ///////////////////////
 
     /** Called when the calendar data has been updated. */
     updateCalendar = function () {
@@ -454,94 +428,12 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         });
     };
 
-    /**
-     * Add some days to a date.
-     * 
-     * @param date
-     *            The date to add the days to.
-     * @param days
-     *            The number of days to add (can be fractional, e.g. 1.6 days).
-     */
-    addDays = function (date, days) {
-        var millis = date.getTime();
-        millis += days * DAY_MILLIS;
-        return new Date(millis);
-    };
-
     hideLoadingIndicator = function () {
         $(".loading", $rootel).stop().hide();
     };
 
     showLoadingIndicator = function () {
         $(".loading", $rootel).fadeIn(1000);
-    };
-
-    buildTimeString = function (date) {
-        var hour = date.getHours();
-        var minute = String(date.getMinutes());
-        if (minute.length === 1) {
-            minute = "0" + minute;
-        }
-        return hour + ":" + minute;
-    };
-
-    getDayDelta = function (from, to) {
-        // Millisecond time @ start of today
-        var fromms = stripTime(from).getTime();
-        var toms = stripTime(to).getTime();
-        // Calculate number of days between from and to.
-        return Math.floor((toms - fromms) / DAY_MILLIS);
-    };
-
-    /**
-     * Builds a relative date string from an integer day delta. Day deltas can
-     * be calculated by getDayDelta().
-     * 
-     * For example: buildRelativeDateString(0) => "Today"
-     * buildRelativeDateString(-1) => "Yesterday" buildRelativeDateString(1) =>
-     * "Tomorrow" buildRelativeDateString(-10) => "10 days ago"
-     * buildRelativeDateString(10) => "In 10 days"
-     */
-    buildRelativeDateString = function (delta) {
-        // make sure we have an integer
-        var days = Math.floor(delta);
-        if (days === 0) {
-            return "Today";
-        }
-        if (days === 1) {
-            return "Tomorrow";
-        }
-        if (days === -1) {
-            return "Yesterday";
-        }
-        if (days < 0) {
-            return String(Math.abs(days)) + " days ago";
-        }
-        return "In " + days + " days time";
-    };
-
-    /**
-     * Builds relative date strings which are even more relative than
-     * buildRelativeDateString() in that it doesn't refer to Today/Yesterday etc
-     * which could confuse people in the context of choosing a general sliding
-     * time window to show events inside.
-     */
-    buildVeryRelativeDateString = function (delta) {
-        var days = Math.floor(delta);
-        if (days === 0) {
-            return "the present day";
-        }
-        if (days < 0) {
-            return String(Math.abs(days)) + " days in the past";
-        }
-        return String(days) + " days in the future";
-    };
-
-    buildAbsoluteDateString = function (date) {
-        var dayName = DAYS[date.getDay()];
-        var dayNumber = date.getDate();
-        var monthName = MONTHS[date.getMonth()];
-        return dayName + " " + dayNumber + " " + monthName;
     };
 
     expandCalendarEntry = function (e) {
@@ -559,10 +451,6 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         summary.addClass("compact expandable").removeClass("contractable");
         expanded.slideUp();
     };
-
-    // ///////////////////////////
-    // Settings View functions //
-    // ///////////////////////////
 
     /**
      * Watch for value changes to the settings URL field in order to rewrite
@@ -629,10 +517,6 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         }
     };
 
-    // ///////////////////////////
-    // Initialisation function //
-    // ///////////////////////////
-
     setupRangeSlider = function (container, slideFunc) {
         stopJSLintMoaningAboutThisUnusedVarWhichICanDoNothingAbout(container);
         $("#daterangeslider", $rootel).slider({
@@ -652,9 +536,9 @@ sakai_global.calendarfeed = function (tuid, showSettings) {
         var to = ui.values[1];
 
         var fromString = !isFinite(from) ? "any date in the past"
-                : buildVeryRelativeDateString(from);
+                : dates.buildVeryRelativeDateString(from);
         var toString = !isFinite(to) ? "any date in the future"
-                : buildVeryRelativeDateString(to);
+                : dates.buildVeryRelativeDateString(to);
 
         $("#calendarfeed_settings_daterangeslider_label .from", $rootel).text(
             fromString
